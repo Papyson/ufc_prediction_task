@@ -1,0 +1,8 @@
+# Node.js dependencies
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+backend/ufc-prediction-task-firebase-adminsdk-fbsvc-06c876478e.json
+
