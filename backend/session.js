@@ -1,69 +1,501 @@
+// const { admin, firestore } = require('./firebaseConfig');
+// const WAITING_DURATION = 30000; // 30 seconds
+
+// const sessionManager = {
+//   sessionID: null,
+//   updateCallback: null, // Callback to notify session updates
+
+//   // Allow the WebSocket server to set a function for session updates.
+//   setUpdateCallback(callback) {
+//     this.updateCallback = callback;
+//   },
+
+//   /**
+//    * Starts or joins a session.
+//    * Returns an object with { sessionID, waitingEndTime, mode }.
+//    */
+//   async startSession(clientID) {
+//     if (!clientID) {
+//       throw new Error("clientID is required to start a session.");
+//     }
+//     const now = Date.now();
+//     const waitingSessionDoc = await getWaitingSession();
+
+//     if (waitingSessionDoc) {
+//       const sessionData = waitingSessionDoc.data();
+//       const createdAtMillis =
+//         sessionData.createdAt.seconds * 1000 +
+//         Math.floor(sessionData.createdAt.nanoseconds / 1e6);
+//       // Use waitingEndTime from document or calculate it.
+//       const waitingEndTime = sessionData.waitingEndTime
+//         ? sessionData.waitingEndTime.toMillis()
+//         : (createdAtMillis + WAITING_DURATION);
+//       const elapsed = now - createdAtMillis;
+
+//       // Case 1: Existing waiting session (not full and within waiting time)
+//       if (sessionData.participants.length < 3 && elapsed < WAITING_DURATION) {
+//         if (!sessionData.participants.includes(clientID)) {
+//           sessionData.participants.push(clientID);
+//         }
+//         await waitingSessionDoc.ref.update({ participants: sessionData.participants });
+//         this.sessionID = waitingSessionDoc.id;
+//         console.log(`Added ${clientID} to waiting session ${waitingSessionDoc.id}`);
+
+//         // If this join makes the session full (3 participants), update immediately.
+//         if (sessionData.participants.length === 3) {
+//           await waitingSessionDoc.ref.update({
+//             status: 'running',
+//             mode: 'group',
+//             waitingEndTime: admin.firestore.Timestamp.fromMillis(now)
+//           });
+//           console.log(`Session ${waitingSessionDoc.id} is now running as a group session.`);
+//           if (this.updateCallback) {
+//             this.updateCallback({
+//               sessionID: waitingSessionDoc.id,
+//               status: 'running',
+//               mode: 'group',
+//               waitingEndTime: now
+//             });
+//           }
+//           return { sessionID: waitingSessionDoc.id, waitingEndTime: now, mode: 'group' };
+//         }
+//         // Otherwise, still waiting.
+//         return { sessionID: waitingSessionDoc.id, waitingEndTime, mode: 'waiting' };
+//       }
+//       // Case 2: Waiting session with 2 participants and waiting time elapsed.
+//       else if (sessionData.participants.length === 2 && elapsed >= WAITING_DURATION) {
+//         // Create solo sessions for both waiting participants.
+//         for (const participant of sessionData.participants) {
+//           await createSoloSession(participant);
+//           console.log(`Created solo session for ${participant}`);
+//           if (this.updateCallback) {
+//             this.updateCallback({
+//               sessionID: null,
+//               status: 'running',
+//               mode: 'solo',
+//               waitingEndTime: now,
+//               clientID: participant
+//             });
+//           }
+//         }
+//         await waitingSessionDoc.ref.update({ status: 'ended' });
+//         // Create solo session for the current client.
+//         await createSoloSession(clientID);
+//         console.log(`Created solo session for ${clientID}`);
+//         this.sessionID = null;
+//         return { sessionID: null, waitingEndTime: now, mode: 'solo' };
+//       }
+//       // Fallback: Create a new waiting session.
+//       else {
+//         return await createNewWaitingSession(clientID);
+//       }
+//     } else {
+//       // No waiting session exists.
+//       return await createNewWaitingSession(clientID);
+//     }
+//   },
+
+//   /**
+//    * Ends the current session.
+//    */
+//   async endSession() {
+//     if (this.sessionID) {
+//       const sessionRef = firestore.collection('sessions').doc(this.sessionID);
+//       await sessionRef.update({
+//         status: 'ended',
+//         endedAt: admin.firestore.Timestamp.now(),
+//       });
+//       console.log(`Session ${this.sessionID} ended`);
+//       this.sessionID = null;
+//     }
+//   },
+
+//   /**
+//    * Sends data to the current session.
+//    */
+//   async sendData(payload) {
+//     if (this.sessionID) {
+//       const sessionRef = firestore.collection('sessions').doc(this.sessionID);
+//       await sessionRef.update({ data: payload });
+//     }
+//   },
+
+//   getSessionID() {
+//     return this.sessionID;
+//   },
+// };
+
+// /**
+//  * Retrieves an existing waiting session.
+//  */
+// async function getWaitingSession() {
+//   const sessionsRef = firestore.collection('sessions');
+//   const querySnapshot = await sessionsRef.where('status', '==', 'waiting').limit(1).get();
+//   if (!querySnapshot.empty) {
+//     return querySnapshot.docs[0];
+//   }
+//   return null;
+// }
+
+// /**
+//  * Creates a new waiting session.
+//  * Returns an object with { sessionID, waitingEndTime, mode }.
+//  */
+// async function createNewWaitingSession(clientID) {
+//   const sessionRef = firestore.collection('sessions').doc();
+//   const now = Date.now();
+//   const waitingEndTime = now + WAITING_DURATION;
+//   const sessionData = {
+//     createdAt: admin.firestore.Timestamp.now(),
+//     waitingEndTime: admin.firestore.Timestamp.fromMillis(waitingEndTime),
+//     endedAt: null,
+//     participants: [clientID],
+//     status: 'waiting',
+//     mode: 'waiting'
+//   };
+//   await sessionRef.set(sessionData);
+//   sessionManager.sessionID = sessionRef.id;
+//   console.log(`Created new waiting session ${sessionRef.id} for ${clientID}`);
+
+//   // After WAITING_DURATION, if still waiting, update based on participant count.
+//   setTimeout(async () => {
+//     const sessionSnap = await sessionRef.get();
+//     if (sessionSnap.exists) {
+//       const data = sessionSnap.data();
+//       if (data.status === 'waiting') {
+//         const nowTimeout = Date.now();
+//         if (data.participants.length === 1) {
+//           await sessionRef.update({
+//             status: 'running',
+//             mode: 'solo',
+//             waitingEndTime: admin.firestore.Timestamp.fromMillis(nowTimeout)
+//           });
+//           console.log(`Session ${sessionRef.id} updated to running (solo).`);
+//           if (sessionManager.updateCallback) {
+//             sessionManager.updateCallback({
+//               sessionID: sessionRef.id,
+//               status: 'running',
+//               mode: 'solo',
+//               waitingEndTime: nowTimeout
+//             });
+//           }
+//         } else if (data.participants.length === 3) {
+//           await sessionRef.update({
+//             status: 'running',
+//             mode: 'group',
+//             waitingEndTime: admin.firestore.Timestamp.fromMillis(nowTimeout)
+//           });
+//           console.log(`Session ${sessionRef.id} updated to running (group).`);
+//           if (sessionManager.updateCallback) {
+//             sessionManager.updateCallback({
+//               sessionID: sessionRef.id,
+//               status: 'running',
+//               mode: 'group',
+//               waitingEndTime: nowTimeout
+//             });
+//           }
+//         }
+//       }
+//     }
+//   }, WAITING_DURATION);
+
+//   return { sessionID: sessionRef.id, waitingEndTime, mode: 'waiting' };
+// }
+
+// /**
+//  * Creates a solo session for the given client.
+//  */
+// async function createSoloSession(clientID) {
+//   const sessionRef = firestore.collection('sessions').doc();
+//   const sessionData = {
+//     createdAt: admin.firestore.Timestamp.now(),
+//     endedAt: null,
+//     participants: [clientID],
+//     status: 'running',
+//     mode: 'solo'
+//   };
+//   await sessionRef.set(sessionData);
+//   console.log(`Created solo session ${sessionRef.id} for ${clientID}`);
+// }
+
+// module.exports = sessionManager;
+
+
 // backend/session.js
-const admin = require('./firebaseConfig'); // Adjust path if necessary
+const { admin, firestore } = require('./firebaseConfig');
+const WAITING_DURATION = 30000; // 30 seconds
 
-const sessionManager = (() => {
-  let sessionID = null;
+const sessionManager = {
+  sessionID: null,
+  updateCallback: null, // Callback to notify session updates
+
+  // Allows setting an update callback (e.g., to broadcast session updates)
+  setUpdateCallback(callback) {
+    this.updateCallback = callback;
+  },
 
   /**
-   * Starts a session by generating a unique session ID and logging the event to Firebase.
+   * Starts or joins a session.
+   * Returns an object with { sessionID, waitingEndTime, mode }.
    */
-  async function startSession() {
-    try {
-      sessionID = Date.now() + '-' + Math.floor(Math.random() * 10000);
-      console.log("Session started with ID:", sessionID);
-      const db = admin.database();
-      await db.ref('sessionLogs').push({
-        event: "startSession",
-        sessionID: sessionID,
-        timestamp: new Date().toISOString()
+  async startSession(clientID) {
+    if (!clientID) {
+      throw new Error("clientID is required to start a session.");
+    }
+    const now = Date.now();
+    const waitingSessionDoc = await getWaitingSession();
+
+    if (waitingSessionDoc) {
+      const sessionData = waitingSessionDoc.data();
+      const createdAtMillis =
+        sessionData.createdAt.seconds * 1000 +
+        Math.floor(sessionData.createdAt.nanoseconds / 1e6);
+      const waitingEndTime = sessionData.waitingEndTime
+        ? sessionData.waitingEndTime.toMillis()
+        : (createdAtMillis + WAITING_DURATION);
+      const elapsed = now - createdAtMillis;
+
+      // Case 1: Existing waiting session (not full and within waiting time)
+      if (sessionData.participants.length < 3 && elapsed < WAITING_DURATION) {
+        if (!sessionData.participants.includes(clientID)) {
+          sessionData.participants.push(clientID);
+        }
+        await waitingSessionDoc.ref.update({ participants: sessionData.participants });
+        this.sessionID = waitingSessionDoc.id;
+        console.log(`Added ${clientID} to waiting session ${waitingSessionDoc.id}`);
+
+        // If the session is now full (3 participants), update to group mode.
+        if (sessionData.participants.length === 3) {
+          await waitingSessionDoc.ref.update({
+            status: 'running',
+            mode: 'group',
+            waitingEndTime: admin.firestore.Timestamp.fromMillis(now)
+          });
+          console.log(`Session ${waitingSessionDoc.id} is now running as a group session.`);
+          if (this.updateCallback) {
+            this.updateCallback({
+              sessionID: waitingSessionDoc.id,
+              status: 'running',
+              mode: 'group',
+              waitingEndTime: now
+            });
+          }
+          return { sessionID: waitingSessionDoc.id, waitingEndTime: now, mode: 'group' };
+        }
+        return { sessionID: waitingSessionDoc.id, waitingEndTime, mode: 'waiting' };
+      }
+      // Case 2: Waiting session exists with 2 participants and waiting time elapsed.
+      else if (sessionData.participants.length === 2 && elapsed >= WAITING_DURATION) {
+        for (const participant of sessionData.participants) {
+          await createSoloSession(participant);
+          console.log(`Created solo session for ${participant}`);
+          if (this.updateCallback) {
+            this.updateCallback({
+              sessionID: null,
+              status: 'running',
+              mode: 'solo',
+              waitingEndTime: now,
+              clientID: participant
+            });
+          }
+        }
+        await waitingSessionDoc.ref.update({ status: 'ended' });
+        await createSoloSession(clientID);
+        console.log(`Created solo session for ${clientID}`);
+        this.sessionID = null;
+        return { sessionID: null, waitingEndTime: now, mode: 'solo' };
+      }
+      // Fallback: Create a new waiting session.
+      else {
+        return await createNewWaitingSession(clientID);
+      }
+    } else {
+      // No waiting session exists; create one.
+      return await createNewWaitingSession(clientID);
+    }
+  },
+
+  /**
+   * Ends the current session.
+   * Note: We do not immediately clear the sessionID so that post-task data can still be written.
+   */
+  async endSession() {
+    if (this.sessionID) {
+      const sessionRef = firestore.collection('sessions').doc(this.sessionID);
+      await sessionRef.update({
+        status: 'ended',
+        endedAt: admin.firestore.Timestamp.now(),
       });
-    } catch (error) {
-      console.error("Error starting session:", error);
+      console.log(`Session ${this.sessionID} ended`);
+      // Intentionally do not clear sessionID here.
     }
-  }
+  },
 
   /**
-   * Ends the session and logs the event to Firebase.
+   * Processes incoming data from the client and writes it to the appropriate sub-collection.
+   * Supported events: "trialData", "preTaskSurvey", "postTaskSurvey", "finishSession"
    */
-  async function endSession() {
-    try {
-      console.log("Session ended with ID:", sessionID);
-      const db = admin.database();
-      await db.ref('sessionLogs').push({
-        event: "endSession",
-        sessionID: sessionID,
-        timestamp: new Date().toISOString()
+  async sendData(payload) {
+    if (!this.sessionID) return;
+    const sessionRef = firestore.collection('sessions').doc(this.sessionID);
+
+    if (payload.event === 'trialData') {
+      if (payload.data.mode === 'group') {
+        // For group mode, aggregate individual trial data.
+        const trialDocId = `trial_${payload.data.trialNumber}_group`;
+        const trialDocRef = sessionRef.collection('trials').doc(trialDocId);
+        await firestore.runTransaction(async (transaction) => {
+          const doc = await transaction.get(trialDocRef);
+          const commonData = {
+            trialNumber: payload.data.trialNumber,
+            mode: 'group',
+            fighterData: payload.data.fighterData,
+            aiPrediction: payload.data.aiPrediction,
+            aiRationale: payload.data.aiRationale
+          };
+          let submissions = {};
+          if (!doc.exists) {
+            submissions[payload.data.clientID] = {
+              initialWager: payload.data.initialWager,
+              finalWager: payload.data.finalWager,
+              chatMessages: payload.data.chatMessages,
+              timestamp: payload.data.timestamp
+            };
+            transaction.set(trialDocRef, { ...commonData, submissions });
+          } else {
+            const existingData = doc.data();
+            submissions = existingData.submissions || {};
+            submissions[payload.data.clientID] = {
+              initialWager: payload.data.initialWager,
+              finalWager: payload.data.finalWager,
+              chatMessages: payload.data.chatMessages,
+              timestamp: payload.data.timestamp
+            };
+            transaction.update(trialDocRef, { submissions });
+          }
+        });
+        console.log(`Aggregated group trial data updated for trial ${payload.data.trialNumber}`);
+      } else {
+        // Solo mode: store each trial as a separate document.
+        await sessionRef.collection('trials').add(payload.data);
+        console.log("Trial data stored in subcollection for session:", this.sessionID);
+      }
+    } else if (payload.event === 'preTaskSurvey') {
+      // Save pre-task survey under a unique document ID.
+      await sessionRef.collection('participantData').doc(`${payload.data.clientID}_preTask`).set(payload.data);
+      console.log("Pre-task survey data stored for session:", this.sessionID);
+    } else if (payload.event === 'postTaskSurvey') {
+      // Save post-task survey under a unique document ID.
+      await sessionRef.collection('participantData').doc(`${payload.data.clientID}_postTask`).set(payload.data);
+      console.log("Post-task survey data stored for session:", this.sessionID);
+    } else if (payload.event === 'finishSession') {
+      // Instead of a simple counter, use an array of finished IDs.
+      await sessionRef.update({
+        finishedIDs: admin.firestore.FieldValue.arrayUnion(payload.data.clientID)
       });
-    } catch (error) {
-      console.error("Error ending session:", error);
+      const sessionSnap = await sessionRef.get();
+      const data = sessionSnap.data();
+      const finishedIDs = data.finishedIDs || [];
+      const totalParticipants = data.participants ? data.participants.length : 1;
+      if (finishedIDs.length >= totalParticipants) {
+        await this.endSession();
+        console.log("All participants finished. Session ended.");
+        if (this.updateCallback) {
+          this.updateCallback({ sessionID: this.sessionID, status: 'ended' });
+        }
+      }
+    } else {
+      console.log("Unknown payload event:", payload.event);
     }
-  }
+  },
 
-  /**
-   * Sends data to Firebase by pushing it under the "trialData" node.
-   * @param {Object} data - The data payload to be stored.
-   */
-  async function sendData(data) {
-    try {
-      const db = admin.database();
-      await db.ref('trialData').push(data);
-      console.log("Data sent successfully for session:", sessionID);
-    } catch (error) {
-      console.error("Error sending data to Firebase:", error);
-      // Optionally, implement retry logic here.
-    }
+  getSessionID() {
+    return this.sessionID;
   }
+};
 
-  function getSessionID() {
-    return sessionID;
+async function getWaitingSession() {
+  const sessionsRef = firestore.collection('sessions');
+  const querySnapshot = await sessionsRef.where('status', '==', 'waiting').limit(1).get();
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0];
   }
+  return null;
+}
 
-  return {
-    startSession,
-    endSession,
-    getSessionID,
-    sendData
+async function createNewWaitingSession(clientID) {
+  const sessionRef = firestore.collection('sessions').doc();
+  const now = Date.now();
+  const waitingEndTime = now + WAITING_DURATION;
+  const sessionData = {
+    createdAt: admin.firestore.Timestamp.now(),
+    waitingEndTime: admin.firestore.Timestamp.fromMillis(waitingEndTime),
+    endedAt: null,
+    participants: [clientID],
+    status: 'waiting',
+    mode: 'waiting',
+    finishedIDs: []
   };
-})();
+  await sessionRef.set(sessionData);
+  sessionManager.sessionID = sessionRef.id;
+  console.log(`Created new waiting session ${sessionRef.id} for ${clientID}`);
+
+  // After WAITING_DURATION, update the session if still waiting.
+  setTimeout(async () => {
+    const sessionSnap = await sessionRef.get();
+    if (sessionSnap.exists) {
+      const data = sessionSnap.data();
+      if (data.status === 'waiting') {
+        const nowTimeout = Date.now();
+        if (data.participants.length === 1) {
+          await sessionRef.update({
+            status: 'running',
+            mode: 'solo',
+            waitingEndTime: admin.firestore.Timestamp.fromMillis(nowTimeout)
+          });
+          console.log(`Session ${sessionRef.id} updated to running (solo).`);
+          if (sessionManager.updateCallback) {
+            sessionManager.updateCallback({
+              sessionID: sessionRef.id,
+              status: 'running',
+              mode: 'solo',
+              waitingEndTime: nowTimeout
+            });
+          }
+        } else if (data.participants.length === 3) {
+          await sessionRef.update({
+            status: 'running',
+            mode: 'group',
+            waitingEndTime: admin.firestore.Timestamp.fromMillis(nowTimeout)
+          });
+          console.log(`Session ${sessionRef.id} updated to running (group).`);
+          if (sessionManager.updateCallback) {
+            sessionManager.updateCallback({
+              sessionID: sessionRef.id,
+              status: 'running',
+              mode: 'group',
+              waitingEndTime: nowTimeout
+            });
+          }
+        }
+      }
+    }
+  }, WAITING_DURATION);
+
+  return { sessionID: sessionRef.id, waitingEndTime, mode: 'waiting' };
+}
+
+async function createSoloSession(clientID) {
+  const sessionRef = firestore.collection('sessions').doc();
+  const sessionData = {
+    createdAt: admin.firestore.Timestamp.now(),
+    endedAt: null,
+    participants: [clientID],
+    status: 'running',
+    mode: 'solo'
+  };
+  await sessionRef.set(sessionData);
+  console.log(`Created solo session ${sessionRef.id} for ${clientID}`);
+}
 
 module.exports = sessionManager;
