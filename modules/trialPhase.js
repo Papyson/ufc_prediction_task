@@ -1,33 +1,24 @@
+
 // modules/trialPhase.js
-const GROUP_TRIAL_DURATION = 15000;
+
 let trialResults = [];
 let groupChatMessages = [];
-let groupTrialStartTime = null;
-let autoTransitionTimerId = null;
-let isGroupWagerConfirmed = false;
-const GROUP_PHASE_DURATION = 15000;
-let groupPhaseStartTime = null;
-let autoTransitionFinalDecision = null;
-let autoTransitionResult = null;
-let finalDecisionConfirmed = false;
-let resultConfirmed = false;
-let soloInitialStartTime = null;
-let soloInitialAutoTransitionTimer = null;
-let soloInitialConfirmed = false;
-let trialDataSaved = false;
+let initialWager = 2;
+let finalWager = 2;
+let currentTrial = 1;
+let totalTrials = 5; // For testing (use 50 in production)
+let isSolo = false;
+let currentFightData = null;
+let serverAiCorrect = null; // Outcome provided by server
+let sessionID = null;
+let currentPhase = null;
+let phaseStartTime = null;
+let phaseDuration = 15000; // Default 15 seconds, updated by server
+let ws;
 
 const trialPhase = (function () {
   let appContainer;
   let initialScreen, groupDelibScreen, finalDecisionScreen, resultScreen;
-  let currentTrial = 1;
-  const totalTrials = 5; // For testing (use 50 in production)
-  let isSolo = false;
-  let currentFightData = null;
-  let initialWager = 2;
-  let finalWager = 2;
-  let aiCorrect = false;
-  let chatTimerId, wagerTimerId, proceedTimerId;
-  let ws;
 
   function init(webSocketInstance) {
     ws = webSocketInstance;
@@ -36,48 +27,165 @@ const trialPhase = (function () {
     buildGroupDelibScreen();
     buildFinalDecisionScreen();
     buildResultScreen();
+
+    // Set up WebSocket listener for server messages
+    ws.addEventListener("message", handleServerMessage);
+  }
+
+  function handleServerMessage(event) {
+    try {
+      const data = JSON.parse(event.data);
+
+      if (data.type === "sessionStarted") {
+        sessionID = data.sessionID;
+        isSolo = data.mode === "solo";
+      } else if (data.type === "phaseChange") {
+        // Update trial state from server
+        currentTrial = data.trial;
+        totalTrials = data.totalTrials;
+        currentPhase = data.phase;
+        phaseStartTime = data.startTime;
+        phaseDuration = data.duration;
+
+        // Handle phase-specific data (e.g., outcome for result phase)
+        if (data.phase === "result" && data.aiCorrect !== undefined) {
+          serverAiCorrect = data.aiCorrect;
+        }
+
+        // Display the appropriate screen
+        switch (data.phase) {
+          case "initial":
+            showTrialScreenSolo();
+            break;
+          case "groupDelib":
+            showGroupDelibScreen();
+            break;
+          case "finalDecision":
+            showFinalDecisionScreen();
+            break;
+          case "result":
+            showResultScreen();
+            break;
+        }
+
+        // Set up countdown for UI feedback
+        setupCountdownDisplay();
+      } else if (data.type === "rejoinSession") {
+        // Rejoin an active session
+        sessionID = data.sessionID;
+        currentTrial = data.trial;
+        totalTrials = data.totalTrials;
+        currentPhase = data.phase;
+        isSolo = data.mode === "solo";
+        phaseStartTime = Date.now() - (phaseDuration - data.remainingTime);
+
+        // Show current phase screen
+        switch (data.phase) {
+          case "initial":
+            showTrialScreenSolo();
+            break;
+          case "groupDelib":
+            showGroupDelibScreen();
+            break;
+          case "finalDecision":
+            showFinalDecisionScreen();
+            break;
+          case "result":
+            showResultScreen();
+            break;
+        }
+
+        // Set up countdown
+        setupCountdownDisplay();
+      } else if (data.type === "trialsCompleted") {
+        // Show post-task survey when all trials are done
+        postTask.showPostTaskScreen();
+      } else if (data.type === "chat") {
+        // Append chat messages from other participants
+        groupChatMessages.push({
+          user: data.clientID,
+          message: data.message,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error("Error handling WebSocket message:", error);
+    }
+  }
+
+  function setupCountdownDisplay() {
+    const countdownInterval = setInterval(() => {
+      let elapsed = Date.now() - phaseStartTime;
+      let remaining = Math.max(0, phaseDuration - elapsed);
+      updateCountdownDisplay(remaining);
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+      }
+    }, 1000);
+  }
+
+  function updateCountdownDisplay(remainingTime) {
+    const seconds = Math.ceil(remainingTime / 1000);
+    const countdownText = `Time remaining: ${seconds} seconds`;
+
+    switch (currentPhase) {
+      case "initial":
+        const soloCountdownEl = document.getElementById("solo-initial-countdown");
+        if (soloCountdownEl) soloCountdownEl.textContent = countdownText;
+        break;
+      case "groupDelib":
+        const groupCountdownEl = document.getElementById("group-initial-countdown");
+        if (groupCountdownEl) groupCountdownEl.textContent = countdownText;
+        break;
+      case "finalDecision":
+        const finalCountdownEl = document.getElementById("final-decision-countdown");
+        if (finalCountdownEl) finalCountdownEl.textContent = countdownText;
+        break;
+      case "result":
+        const resultCountdownEl = document.getElementById("result-countdown");
+        if (resultCountdownEl)
+          resultCountdownEl.textContent = `Moving to next trial in ${seconds} seconds`;
+        break;
+    }
   }
 
   function buildInitialScreen() {
     initialScreen = document.createElement("div");
     initialScreen.classList.add("screen");
     initialScreen.innerHTML = `
-      <h2>Trial ${currentTrial} of ${totalTrials} - Initial Stage</h2>
+      <h2>Trial <span id="solo-trial-number">${currentTrial}</span> of ${totalTrials} - Initial Stage</h2>
       <div id="initial-content"></div>
       <button id="btn-confirm-initial">Confirm Initial Wager</button>
     `;
     appContainer.appendChild(initialScreen);
-    initialScreen.querySelector("#btn-confirm-initial").addEventListener("click", onConfirmInitial);
+    initialScreen
+      .querySelector("#btn-confirm-initial")
+      .addEventListener("click", onConfirmInitial);
   }
 
   function onConfirmInitial() {
-    if (soloInitialConfirmed) return; // Prevent multiple calls
-    soloInitialConfirmed = true;
-
-    // Clear the auto‑transition timer if it exists
-    if (soloInitialAutoTransitionTimer) {
-      clearTimeout(soloInitialAutoTransitionTimer);
-      soloInitialAutoTransitionTimer = null;
-    }
-
-    // Optionally disable the confirm button
+    const wagerSlider = initialScreen.querySelector("#initial-wager-range");
+    initialWager = parseInt(wagerSlider.value, 10);
+    wagerSlider.disabled = true;
     document.getElementById("btn-confirm-initial").disabled = true;
 
-    // Append a message that we're moving to the next stage
-    const contentEl = initialScreen.querySelector("#initial-content");
-    const movingMsgEl = document.createElement("p");
-    movingMsgEl.innerHTML = "<strong>Moving to final decision...</strong>";
-    contentEl.appendChild(movingMsgEl);
-
-    // Calculate remaining time for this phase
-    let elapsed = Date.now() - soloInitialStartTime;
-    let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-
-    setTimeout(() => {
-      finalWager = initialWager;
-      hideAllScreens();
-      showFinalDecisionScreen();
-    }, remaining);
+    ws.send(
+      JSON.stringify({
+        type: "updateWager",
+        clientID: sessionStorage.getItem("PROLIFIC_PID") || "unknown",
+        sessionID: sessionID,
+        wagerType: "initialWager",
+        value: initialWager,
+      })
+    );
+    ws.send(
+      JSON.stringify({
+        type: "confirmDecision",
+        clientID: sessionStorage.getItem("PROLIFIC_PID") || "unknown",
+        sessionID: sessionID,
+        phase: "initial",
+      })
+    );
   }
 
   function buildGroupDelibScreen() {
@@ -98,18 +206,132 @@ const trialPhase = (function () {
         <hr>
         <div id="wager-section">
           <h3>Your Wager</h3>
-          <div id="wager-container" style="display:none; margin-top: 20px;">
+          <div id="wager-container" style="display:block; margin-top: 20px;">
             <label for="group-wager-range">Wager Scale (0-4):</label>
             <input type="range" id="group-wager-range" min="0" max="4" step="1" value="2">
             <button id="btn-confirm-group-wager">Confirm Wager</button>
           </div>
-          <div id="wager-suggestion" style="margin-top:20px;"></div>
         </div>
+        <div id="group-initial-countdown" style="margin-top:10px;"></div>
       </div>
     `;
     appContainer.appendChild(groupDelibScreen);
-    groupDelibScreen.querySelector("#chat-send-btn").addEventListener("click", onGroupChatSend);
-    groupDelibScreen.querySelector("#btn-confirm-group-wager").addEventListener("click", onConfirmGroupWager);
+    groupDelibScreen
+      .querySelector("#chat-send-btn")
+      .addEventListener("click", onGroupChatSend);
+    groupDelibScreen
+      .querySelector("#btn-confirm-group-wager")
+      .addEventListener("click", onConfirmGroupWager);
+  }
+
+  function onGroupChatSend() {
+    const chatInput = groupDelibScreen.querySelector("#chat-input-text");
+    const message = chatInput.value.trim();
+    if (message) {
+      chat.sendMessage(message);
+      chat.appendMessage("You", message);
+      groupChatMessages.push({
+        user: "You",
+        message: message,
+        timestamp: new Date().toISOString(),
+      });
+      chatInput.value = "";
+    }
+  }
+
+  function onConfirmGroupWager() {
+    const wagerSlider = groupDelibScreen.querySelector("#group-wager-range");
+    initialWager = parseInt(wagerSlider.value, 10);
+    wagerSlider.disabled = true;
+    groupDelibScreen.querySelector("#btn-confirm-group-wager").disabled = true;
+
+    ws.send(
+      JSON.stringify({
+        type: "updateWager",
+        clientID: sessionStorage.getItem("PROLIFIC_PID") || "unknown",
+        sessionID: sessionID,
+        wagerType: "initialWager",
+        value: initialWager,
+      })
+    );
+    ws.send(
+      JSON.stringify({
+        type: "confirmDecision",
+        clientID: sessionStorage.getItem("PROLIFIC_PID") || "unknown",
+        sessionID: sessionID,
+        phase: "groupDelib",
+      })
+    );
+  }
+
+  function buildFinalDecisionScreen() {
+    finalDecisionScreen = document.createElement("div");
+    finalDecisionScreen.classList.add("screen");
+    finalDecisionScreen.innerHTML = `
+      <h2>Final Prediction & Stake Confirmation (Trial <span id="trial-number"></span> of ${totalTrials})</h2>
+      <div id="final-decision-content"></div>
+      <button id="btn-confirm-decision">Stake</button>
+    `;
+    appContainer.appendChild(finalDecisionScreen);
+    finalDecisionScreen
+      .querySelector("#btn-confirm-decision")
+      .addEventListener("click", onConfirmFinalDecision);
+  }
+
+  function onConfirmFinalDecision() {
+    const wagerSlider = finalDecisionScreen.querySelector("#final-wager-range");
+    finalWager = parseInt(wagerSlider.value, 10);
+    wagerSlider.disabled = true;
+    finalDecisionScreen.querySelector("#btn-confirm-decision").disabled = true;
+
+    ws.send(
+      JSON.stringify({
+        type: "updateWager",
+        clientID: sessionStorage.getItem("PROLIFIC_PID") || "unknown",
+        sessionID: sessionID,
+        wagerType: "finalWager",
+        value: finalWager,
+      })
+    );
+    ws.send(
+      JSON.stringify({
+        type: "confirmDecision",
+        clientID: sessionStorage.getItem("PROLIFIC_PID") || "unknown",
+        sessionID: sessionID,
+        phase: "finalDecision",
+      })
+    );
+  }
+
+  function buildResultScreen() {
+    resultScreen = document.createElement("div");
+    resultScreen.classList.add("screen");
+    resultScreen.innerHTML = `
+      <h2>Fight Outcome</h2>
+      <div id="result-content"></div>
+    `;
+    appContainer.appendChild(resultScreen);
+  }
+
+  function showTrialScreenSolo() {
+    hideAllScreens();
+    initialScreen.querySelector("#solo-trial-number").textContent = currentTrial;
+    loadTrialData();
+    const contentEl = initialScreen.querySelector("#initial-content");
+    const wallet = utilities.getWallet();
+    contentEl.innerHTML = `
+      <p><strong>Wallet:</strong> $${wallet}</p>
+      ${generateFighterTableHTML()}
+      <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
+      <p><strong>Rationale:</strong> ${currentFightData.aiRationale}</p>
+      <div style="margin-top: 20px;">
+        <label>Initial Wager (0-4):</label>
+        <input type="range" min="0" max="4" step="1" value="${initialWager}" id="initial-wager-range" />
+      </div>
+      <div id="solo-initial-countdown" style="margin-top:10px;"></div>
+    `;
+    document.getElementById("btn-confirm-initial").disabled = false;
+    initialScreen.style.display = "block";
   }
 
   function showGroupDelibScreen() {
@@ -124,182 +346,17 @@ const trialPhase = (function () {
       <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
       <p><strong>Rationale:</strong> ${currentFightData.aiRationale}</p>
     `;
-
-    // Reset chat and wager UI elements
     groupDelibScreen.querySelector("#chat-messages").innerHTML = "";
-    const chatInputDiv = groupDelibScreen.querySelector(".chat-input");
-    chatInputDiv.style.display = "block";
     const chatInput = groupDelibScreen.querySelector("#chat-input-text");
     chatInput.disabled = false;
     chatInput.value = "";
     groupDelibScreen.querySelector("#chat-send-btn").disabled = false;
-    groupDelibScreen.querySelector("#wager-container").style.display = "none";
-    groupDelibScreen.querySelector("#wager-suggestion").innerHTML = "";
-    initialWager = 2;
-    finalWager = 2;
-    groupDelibScreen.querySelector("#group-wager-range").value = initialWager;
-    groupChatMessages = [];
-
-    isGroupWagerConfirmed = false;
-
-    // Append countdown element for group confirm initial wager (ensure only one exists)
-    let groupCountdownEl = groupDelibScreen.querySelector("#group-initial-countdown");
-    if (!groupCountdownEl) {
-      groupCountdownEl = document.createElement("div");
-      groupCountdownEl.id = "group-initial-countdown";
-      groupCountdownEl.style.marginTop = "10px";
-      groupDelibScreen.querySelector("#group-content").appendChild(groupCountdownEl);
-    } else {
-      groupCountdownEl.textContent = "";
-    }
-
-
-    // Reset timing variables for group initial phase
-    groupTrialStartTime = Date.now();
-
-    // Start countdown interval for group initial phase
-    const groupInitialCountdownInterval = setInterval(() => {
-      let elapsed = Date.now() - groupTrialStartTime;
-      let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-      groupCountdownEl.textContent = `Time remaining: ${Math.ceil(remaining / 1000)} seconds`;
-      if (remaining <= 0) {
-        clearInterval(groupInitialCountdownInterval);
-      }
-    }, 1000);
-
-    // Existing chat timer—here updated to use the same duration if needed
-    chatTimerId = setTimeout(() => {
-      // Disable chat input and button
-      chatInput.disabled = true;
-      groupDelibScreen.querySelector("#chat-send-btn").disabled = true;
-
-      // Hide or clear the chat countdown element
-      const groupCountdownEl = groupDelibScreen.querySelector("#group-initial-countdown");
-      if (groupCountdownEl) {
-        groupCountdownEl.textContent = "";
-      }
-
-      // Show the wager container
-      const wagerContainer = groupDelibScreen.querySelector("#wager-container");
-      wagerContainer.style.display = "block";
-
-      // Append a new countdown element for the wager confirmation if not present
-      let wagerCountdownEl = wagerContainer.querySelector("#wager-countdown");
-      if (!wagerCountdownEl) {
-        wagerCountdownEl = document.createElement("div");
-        wagerCountdownEl.id = "wager-countdown";
-        wagerCountdownEl.style.marginTop = "10px";
-        wagerContainer.appendChild(wagerCountdownEl);
-      } else {
-        wagerCountdownEl.textContent = "";
-      }
-
-      // Reset the start time for the wager-confirmation phase
-      groupTrialStartTime = Date.now();
-
-      // Start a countdown interval for wager confirmation (e.g., 10 seconds)
-      const wagerCountdownInterval = setInterval(() => {
-        let elapsed = Date.now() - groupTrialStartTime;
-        let remaining = Math.max(0, 10000 - elapsed); // 10 seconds for wager phase
-        wagerCountdownEl.textContent = `Time remaining: ${Math.ceil(remaining / 1000)} seconds`;
-        if (remaining <= 0) {
-          clearInterval(wagerCountdownInterval);
-        }
-      }, 1000);
-
-      // Set the auto-transition timer for wager confirmation
-      wagerTimerId = setTimeout(() => {
-        onConfirmGroupWager();
-      }, 10000);
-
-    }, GROUP_PHASE_DURATION);
-
-
-    groupDelibScreen.style.display = "block";
-  }
-
-  function onGroupChatSend() {
-    const chatInput = groupDelibScreen.querySelector("#chat-input-text");
-    const message = chatInput.value.trim();
-    if (message) {
-      // Send the message via the chat module
-      chat.sendMessage(message);
-  
-      // Append the message locally
-      chat.appendMessage("You", message);
-      groupChatMessages.push({
-        user: "You",
-        message: message,
-        timestamp: new Date().toISOString()
-      });
-      chatInput.value = "";
-  
-      // If wager input is not yet displayed, force its display immediately.
-      if (groupDelibScreen.querySelector("#wager-container").style.display === "none") {
-        clearTimeout(chatTimerId);
-        chatInput.disabled = true;
-        groupDelibScreen.querySelector("#chat-send-btn").disabled = true;
-        groupDelibScreen.querySelector("#wager-container").style.display = "block";
-        startWagerTimer();
-      }
-    }
-  }
-
-  function startWagerTimer() {
-    wagerTimerId = setTimeout(() => {
-      onConfirmGroupWager();
-    }, 10000);
-  }
-
-  function onConfirmGroupWager() {
-    // Prevent multiple confirmations
-    if (isGroupWagerConfirmed) return;
-    isGroupWagerConfirmed = true;
-
-    // Clear any pending wager timer if it exists
-    if (wagerTimerId) {
-      clearTimeout(wagerTimerId);
-      wagerTimerId = null;
-    }
-
-    // Capture the wager
     const wagerSlider = groupDelibScreen.querySelector("#group-wager-range");
-    initialWager = parseInt(wagerSlider.value, 10);
-    finalWager = initialWager;
-    groupDelibScreen.querySelector(".chat-input").style.display = "none";
-    groupDelibScreen.querySelector("#wager-container").style.display = "none";
-    const wagerSuggestionEl = groupDelibScreen.querySelector("#wager-suggestion");
-    wagerSuggestionEl.innerHTML = `<p><strong>Your Wager:</strong> ${finalWager}</p>`;
-
-    // Clear the auto‑transition timer if it exists
-    if (autoTransitionTimerId) {
-      clearTimeout(autoTransitionTimerId);
-      autoTransitionTimerId = null;
-    }
-
-    // Calculate remaining time so that the final screen shows exactly at 15 seconds
-    const elapsedTime = Date.now() - groupTrialStartTime;
-    const remainingTime = GROUP_TRIAL_DURATION - elapsedTime;
-
-    if (remainingTime > 0) {
-      setTimeout(() => {
-        showFinalDecisionScreen();
-      }, remainingTime);
-    } else {
-      showFinalDecisionScreen();
-    }
-  }
-
-  function buildFinalDecisionScreen() {
-    finalDecisionScreen = document.createElement("div");
-    finalDecisionScreen.classList.add("screen");
-    finalDecisionScreen.innerHTML = `
-      <h2>Final Prediction & Stake Confirmation (Trial <span id="trial-number"></span> of ${totalTrials})</h2>
-      <div id="final-decision-content"></div>
-      <button id="btn-confirm-decision">Stake</button>
-    `;
-    appContainer.appendChild(finalDecisionScreen);
-    finalDecisionScreen.querySelector("#btn-confirm-decision").addEventListener("click", onConfirmFinalDecision);
+    wagerSlider.value = initialWager;
+    wagerSlider.disabled = false;
+    groupDelibScreen.querySelector("#btn-confirm-group-wager").disabled = false;
+    groupChatMessages = [];
+    groupDelibScreen.style.display = "block";
   }
 
   function showFinalDecisionScreen() {
@@ -318,81 +375,16 @@ const trialPhase = (function () {
       </div>
       <div id="final-decision-countdown" style="margin-top:10px;"></div>
     `;
-    const finalWagerSlider = contentEl.querySelector("#final-wager-range");
-    finalWagerSlider.addEventListener("input", (e) => {
-      finalWager = parseInt(e.target.value, 10);
-    });
-
-    // Reset flag and record start time
-    finalDecisionConfirmed = false;
-    groupPhaseStartTime = Date.now();
-
-    // Start countdown interval for the final decision screen
-    const countdownInterval = setInterval(() => {
-      let elapsed = Date.now() - groupPhaseStartTime;
-      let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-      contentEl.querySelector("#final-decision-countdown").textContent = `Time remaining: ${Math.ceil(remaining / 1000)} seconds`;
-      if (remaining <= 0) {
-        clearInterval(countdownInterval);
-      }
-    }, 1000);
-
-    // Auto-transition if user hasn’t confirmed within GROUP_PHASE_DURATION
-    autoTransitionFinalDecision = setTimeout(() => {
-      onConfirmFinalDecision();
-    }, GROUP_PHASE_DURATION);
-
+    finalDecisionScreen.querySelector("#btn-confirm-decision").disabled = false;
     finalDecisionScreen.style.display = "block";
   }
 
-  function onConfirmFinalDecision() {
-    if (finalDecisionConfirmed) return; // Prevent multiple calls
-    finalDecisionConfirmed = true;
-
-    // Clear the auto-transition timer if it exists
-    if (autoTransitionFinalDecision) {
-      clearTimeout(autoTransitionFinalDecision);
-      autoTransitionFinalDecision = null;
-    }
-
-    // Disable the stake button to prevent further clicks
-    finalDecisionScreen.querySelector("#btn-confirm-decision").disabled = true;
-
-    // Append a message indicating the trial will move on
-    const contentEl = finalDecisionScreen.querySelector("#final-decision-content");
-    let movingMsgEl = document.createElement("p");
-    movingMsgEl.innerHTML = "<strong>Moving to next trial...</strong>";
-    contentEl.appendChild(movingMsgEl);
-
-    // Calculate remaining time and wait until the full GROUP_PHASE_DURATION has elapsed before transitioning
-    let elapsed = Date.now() - groupPhaseStartTime;
-    let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-    setTimeout(() => {
-      finalDecisionScreen.style.display = "none";
-      showResultScreen();
-    }, remaining);
-  }
-
-  function buildResultScreen() {
-    resultScreen = document.createElement("div");
-    resultScreen.classList.add("screen");
-    resultScreen.innerHTML = `
-      <h2>Fight Outcome</h2>
-      <div id="result-content"></div>
-      <button id="btn-next-trial">Next Trial</button>
-    `;
-    appContainer.appendChild(resultScreen);
-    resultScreen.querySelector("#btn-next-trial").addEventListener("click", onNextTrial);
-  }
-
   function showResultScreen() {
-    if (resultScreen && resultScreen.style.display === "block") return;
     hideAllScreens();
     let walletBefore = utilities.getWallet();
     let outcomeText = "";
     let stakeAmount = finalWager;
-    aiCorrect = Math.random() < 0.5;
-    if (aiCorrect) {
+    if (serverAiCorrect) {
       let winnings = stakeAmount * 2;
       utilities.setWallet(walletBefore + winnings);
       outcomeText = `AI was correct! You win $${winnings}.`;
@@ -403,39 +395,16 @@ const trialPhase = (function () {
     let walletAfter = utilities.getWallet();
     const resultContent = resultScreen.querySelector("#result-content");
     resultContent.innerHTML = `
-      <p><strong>Fight Outcome:</strong> ${aiCorrect ? "Fighter A wins" : "Fighter B wins"}</p>
+      <p><strong>Fight Outcome:</strong> ${serverAiCorrect ? "Fighter A wins" : "Fighter B wins"}</p>
       <p>${outcomeText}</p>
       <p>Your new wallet balance is: $${walletAfter}</p>
       <div id="result-countdown" style="margin-top:10px;"></div>
     `;
-
-    // Record start time for result screen phase and reset flag
-    resultConfirmed = false;
-    groupPhaseStartTime = Date.now();
-
-    // Start countdown interval for the result screen
-    const resultCountdownInterval = setInterval(() => {
-      let elapsed = Date.now() - groupPhaseStartTime;
-      let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-      resultScreen.querySelector("#result-countdown").textContent = `Moving to next trial in ${Math.ceil(remaining / 1000)} seconds`;
-      if (remaining <= 0) {
-        clearInterval(resultCountdownInterval);
-      }
-    }, 1000);
-
-    // Auto-transition after GROUP_PHASE_DURATION if user hasn’t clicked Next Trial
-    autoTransitionResult = setTimeout(() => {
-      onNextTrial();
-    }, GROUP_PHASE_DURATION);
-
     resultScreen.style.display = "block";
     saveTrialData(walletBefore, walletAfter);
   }
 
   function saveTrialData(walletBefore, walletAfter) {
-    if (trialDataSaved) return;  // Prevent duplicate saving
-    trialDataSaved = true;
-
     const clientID = sessionStorage.getItem("PROLIFIC_PID") || "unknown";
     const trialData = {
       trialNumber: currentTrial,
@@ -446,117 +415,25 @@ const trialPhase = (function () {
       initialWager: initialWager,
       finalWager: finalWager,
       chatMessages: isSolo ? [] : groupChatMessages,
-      aiCorrect: aiCorrect,
+      aiCorrect: serverAiCorrect,
       walletBefore: walletBefore,
       walletAfter: walletAfter,
       timestamp: new Date().toISOString(),
-      clientID: clientID
+      clientID: clientID,
+      sessionID: sessionID,
     };
     trialResults.push(trialData);
     console.log("Trial data saved locally:", trialData);
-    ws.send(JSON.stringify({
-      type: "sendData",
-      payload: { event: "trialData", data: trialData }
-    }));
-  }
-
-  function onNextTrial() {
-    if (resultConfirmed) return; // Prevent multiple calls
-    resultConfirmed = true;
-
-    // Clear the auto-transition timer if it exists
-    if (autoTransitionResult) {
-      clearTimeout(autoTransitionResult);
-      autoTransitionResult = null;
-    }
-
-    // Optionally disable the Next Trial button to prevent multiple clicks
-    resultScreen.querySelector("#btn-next-trial").disabled = true;
-
-    // Append a message indicating the trial will move on
-    let movingMsgEl = document.createElement("p");
-    movingMsgEl.innerHTML = "<strong>Moving to next trial...</strong>";
-    resultScreen.querySelector("#result-content").appendChild(movingMsgEl);
-
-    // Calculate remaining time based on GROUP_PHASE_DURATION
-    let elapsed = Date.now() - groupPhaseStartTime;
-    let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-    setTimeout(() => {
-      currentTrial++;
-      trialDataSaved = false;
-      if (currentTrial <= totalTrials) {
-        initialWager = 2;
-        finalWager = 2;
-        clearTimeout(chatTimerId);
-        clearTimeout(wagerTimerId);
-        clearTimeout(proceedTimerId);
-        // Reset flags for the next trial
-        resultConfirmed = false;
-        finalDecisionConfirmed = false;
-        if (isSolo) {
-          showTrialScreenSolo();
-        } else {
-          showGroupDelibScreen();
-        }
-      } else {
-        // Instead of sending finishSession here, route to Post-Task survey.
-        postTask.showPostTaskScreen();
-      }
-    }, remaining);
-  }
-
-  function showTrialScreenSolo() {
-    hideAllScreens();
-    initialScreen.querySelector("h2").innerHTML = `Trial ${currentTrial} of ${totalTrials} - Initial Stage`;
-    loadTrialData();
-    const contentEl = initialScreen.querySelector("#initial-content");
-    const wallet = utilities.getWallet();
-    contentEl.innerHTML = `
-      <p><strong>Wallet:</strong> $${wallet}</p>
-      ${generateFighterTableHTML()}
-      <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-      <p><strong>Rationale:</strong> ${currentFightData.aiRationale}</p>
-      <div style="margin-top: 20px;">
-        <label>Initial Wager (0-4):</label>
-        <input type="range" min="0" max="4" step="1" value="${initialWager}" id="initial-wager-range" />
-      </div>
-    `;
-
-    // Append countdown element for solo confirm initial wager
-    let soloCountdownEl = document.createElement("div");
-    soloCountdownEl.id = "solo-initial-countdown";
-    soloCountdownEl.style.marginTop = "10px";
-    contentEl.appendChild(soloCountdownEl);
-
-    // Initialize solo timing variables
-    soloInitialConfirmed = false;
-    soloInitialStartTime = Date.now();
-
-    // Start countdown interval for solo initial phase
-    const soloInitialCountdownInterval = setInterval(() => {
-      let elapsed = Date.now() - soloInitialStartTime;
-      let remaining = Math.max(0, GROUP_PHASE_DURATION - elapsed);
-      soloCountdownEl.textContent = `Time remaining: ${Math.ceil(remaining / 1000)} seconds`;
-      if (remaining <= 0) {
-        clearInterval(soloInitialCountdownInterval);
-      }
-    }, 1000);
-
-    // Auto-transition to onConfirmInitial when time is up
-    soloInitialAutoTransitionTimer = setTimeout(() => {
-      onConfirmInitial();
-    }, GROUP_PHASE_DURATION);
-
-    // Listen for changes to the wager slider
-    const wagerSlider = contentEl.querySelector("#initial-wager-range");
-    wagerSlider.addEventListener("input", (e) => {
-      initialWager = parseInt(e.target.value, 10);
-    });
-    initialScreen.style.display = "block";
+    ws.send(
+      JSON.stringify({
+        type: "sendData",
+        payload: { event: "trialData", data: trialData },
+      })
+    );
   }
 
   function hideAllScreens() {
-    document.querySelectorAll(".screen").forEach(screen => {
+    document.querySelectorAll(".screen").forEach((screen) => {
       screen.style.display = "none";
     });
   }
@@ -605,23 +482,32 @@ const trialPhase = (function () {
 
   function loadTrialData() {
     currentFightData = {
-      fighterA: { wins: 8, losses: 2, age: 24.6, height: "5'10\"", strikelaM: "4.5/min", sigSacc: "40%" },
-      fighterB: { wins: 11, losses: 5, age: 27.8, height: "5'11\"", strikelaM: "4.9/min", sigSacc: "50%" },
+      fighterA: {
+        wins: 8,
+        losses: 2,
+        age: 24.6,
+        height: "5'10\"",
+        strikelaM: "4.5/min",
+        sigSacc: "40%",
+      },
+      fighterB: {
+        wins: 11,
+        losses: 5,
+        age: 27.8,
+        height: "5'11\"",
+        strikelaM: "4.9/min",
+        sigSacc: "50%",
+      },
       aiPrediction: "Fighter A will win by TKO",
-      aiRationale: "Better takedown defense and younger age."
+      aiRationale: "Better takedown defense and younger age.",
     };
   }
 
   return {
     init,
-    showTrialScreen: () => {
-      if (isSolo) {
-        showTrialScreenSolo();
-      } else {
-        showGroupDelibScreen();
-      }
+    setMode: (soloMode) => {
+      isSolo = soloMode;
     },
-    setMode: (soloMode) => { isSolo = soloMode; },
-    getTrialResults: () => trialResults
+    getTrialResults: () => trialResults,
   };
 })();

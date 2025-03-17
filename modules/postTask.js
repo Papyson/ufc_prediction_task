@@ -59,9 +59,7 @@ const postTask = (function () {
   function onFinish() {
     // Disable the finish button immediately
     const finishBtn = postTaskScreen.querySelector("#btn-finish");
-    if (finishBtn) {
-      finishBtn.disabled = true;
-    }
+    finishBtn.disabled = true;
 
     // If not already present, create and append a waiting message
     let waitingMsg = postTaskScreen.querySelector(".waiting-message");
@@ -71,20 +69,6 @@ const postTask = (function () {
       waitingMsg.innerHTML = "<strong>Waiting for session to end...</strong>";
       postTaskScreen.appendChild(waitingMsg);
     }
-
-    // Start a 10-second countdown for session finish
-    const countdownEl = document.getElementById("posttask-countdown");
-    let remainTime = 10;
-    countdownEl.textContent = `Session ending in ${remainTime} seconds`;
-
-    const countdownInterval = setInterval(() => {
-      remainTime--;
-      countdownEl.textContent = `Session ending in ${remainTime} seconds`;
-      if (remainTime <= 0) {
-        clearInterval(countdownInterval);
-        finishPostTask();
-      }
-    }, 1000);
   }
 
   function hideAllScreens() {
@@ -132,5 +116,3 @@ const postTask = (function () {
     showPostTaskScreen
   };
 })();
-
-
