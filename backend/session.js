@@ -132,6 +132,7 @@ const sessionManager = {
     const sessionRef = firestore.collection('sessions').doc(sessionID);
 
     if (payload.event === 'trialData') {
+      console.log(payload.data)
       if (payload.data.mode === 'group') {
         // For group mode, aggregate individual trial data.
         const trialDocId = `trial_${payload.data.trialNumber}_group`;

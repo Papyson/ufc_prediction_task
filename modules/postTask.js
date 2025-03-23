@@ -78,6 +78,14 @@ const postTask = (function () {
   }
 
   function finishPostTask() {
+    // Capture survey responses
+    const performanceVal = postTaskScreen.querySelector(
+      "#slider-performance"
+    ).value;
+    const aiPerfVal = postTaskScreen.querySelector("#slider-ai-perf").value;
+    // Save post-task survey data using your utilities module
+    utilities.savePostTaskData({ performanceVal, aiPerfVal });
+
     // Send the finish session payload
     ws.send(JSON.stringify({
       type: "sendData",
