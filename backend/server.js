@@ -374,7 +374,7 @@ function initializeSessionState(sessionID, mode) {
   const trialSetFile = sessionManager.getTrialSetFile(sessionID) || "trial_set_1.csv";
   sessionStates.set(sessionID, {
     currentTrial: 1,
-    totalTrials: 5, // For testing (use 50 in production)
+    totalTrials: 1, // For testing (use 50 in production)
     currentPhase: mode === "group" ? PHASES.GROUP_DELIB : PHASES.INITIAL,
     phaseStartTime: Date.now(),
     mode: mode,
