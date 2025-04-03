@@ -1,4 +1,3 @@
-// modules/postTask.js
 const postTask = (function () {
   let appContainer;
   let postTaskScreen;
@@ -32,14 +31,18 @@ const postTask = (function () {
 
     appContainer.appendChild(postTaskScreen);
 
-    postTaskScreen.querySelector("#btn-finish").addEventListener("click", onFinish);
+    postTaskScreen
+      .querySelector("#btn-finish")
+      .addEventListener("click", onFinish);
   }
 
   function showPostTaskScreen() {
     hideAllScreens();
     postTaskScreen.style.display = "block";
     const finalWallet = utilities.getWallet();
-    document.getElementById("final-wallet").textContent = `Total Winnings: $${finalWallet}`;
+    document.getElementById(
+      "final-wallet"
+    ).textContent = `Total Winnings: $${finalWallet}`;
 
     // Start a 10-second countdown
     const countdownEl = document.getElementById("posttask-countdown");
@@ -72,7 +75,7 @@ const postTask = (function () {
   }
 
   function hideAllScreens() {
-    document.querySelectorAll(".screen").forEach(screen => {
+    document.querySelectorAll(".screen").forEach((screen) => {
       screen.style.display = "none";
     });
   }
@@ -87,10 +90,15 @@ const postTask = (function () {
     utilities.savePostTaskData({ performanceVal, aiPerfVal });
 
     // Send the finish session payload
-    ws.send(JSON.stringify({
-      type: "sendData",
-      payload: { event: "finishSession", data: { clientID: sessionStorage.getItem("PROLIFIC_PID") } }
-    }));
+    ws.send(
+      JSON.stringify({
+        type: "sendData",
+        payload: {
+          event: "finishSession",
+          data: { clientID: sessionStorage.getItem("PROLIFIC_PID") },
+        },
+      })
+    );
 
     // Remove the finish button and waiting message
     const finishBtn = postTaskScreen.querySelector("#btn-finish");
@@ -121,6 +129,6 @@ const postTask = (function () {
 
   return {
     init,
-    showPostTaskScreen
+    showPostTaskScreen,
   };
 })();
