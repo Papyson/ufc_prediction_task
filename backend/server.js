@@ -2,7 +2,7 @@ const WebSocket = require("ws");
 const sessionManager = require("./session");
 const { firestore } = require("./firebaseConfig");
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
 let clients = new Map();
 
 // Trial phase constants
