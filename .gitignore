@@ -6,3 +6,4 @@ node_modules/
 
 backend/ufc-prediction-task-firebase-adminsdk-fbsvc-06c876478e.json
 
+.env
