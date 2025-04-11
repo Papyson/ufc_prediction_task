@@ -1,9 +1,28 @@
+const express = require("express");
+const http = require("http");
 const WebSocket = require("ws");
 const sessionManager = require("./session");
 const { firestore } = require("./firebaseConfig");
 
-const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
+const app = express();
+
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
+
+const server = http.createServer(app);
+
+// const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
+const wss = new WebSocket.Server({ server });
+
 let clients = new Map();
+
+const PORT = process.env.PORT || 8080;
+
+server.listen(PORT, () => {
+  console.log(`Server running on PORT http ${PORT}`);
+  console.log(`Websocket server running on PORT wss ${PORT}`);
+});
 
 // Trial phase constants
 const PHASE_DURATION = 15000; // 15 seconds for each phase
@@ -385,5 +404,3 @@ wss.on("connection", (ws) => {
     broadcastParticipantCount();
   });
 });
-
-console.log("WebSocket server is running on ws://localhost:8080");
