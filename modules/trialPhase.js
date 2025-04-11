@@ -3,7 +3,7 @@ let groupChatMessages = [];
 let initialWager = 2;
 let finalWager = 2;
 let currentTrial = 1;
-let totalTrials = 5; // For testing (use 50 in production)
+let totalTrials = 50; // For testing (use 50 in production)
 let isSolo = false;
 let currentFightData = null;
 let serverAiCorrect = null; // Outcome provided by server
@@ -79,8 +79,8 @@ const trialPhase = (function () {
         }
 
         // Handle phase-specific data (e.g., outcome for result phase)
-        if (data.phase === "result" && data.aiCorrect !== undefined) {
-          serverAiCorrect = data.aiCorrect;
+        if (data.phase === "result" && (data.trialData.winner !== undefined || data.trialData.predicted_winner !== undefined)) {
+          serverAiCorrect = data.trialData.winner === data.trialData.predicted_winner;
           trialDataSaved = false; // Reset for the new result
         }
 
@@ -718,8 +718,7 @@ const trialPhase = (function () {
     let walletAfter = utilities.getWallet();
     const resultContent = resultScreen.querySelector("#result-content");
     resultContent.innerHTML = `
-      <p><strong>Fight Outcome:</strong> ${serverAiCorrect ? "Fighter A wins" : "Fighter B wins"
-      }</p>
+      <p><strong>Fight Outcome:</strong> Fighter ${currentFightData.winner === "0" || currentFightData.winner === 0 ? "B" : "A"} wins</p>
       <p>${outcomeText}</p>
       <p>Your new wallet balance is: $${walletAfter}</p>
       <div id="result-countdown" style="margin-top:10px;"></div>
@@ -878,7 +877,7 @@ const trialPhase = (function () {
             " will win",
           aiRationale: trialDataRow.rationale_feature || "",
           winner: trialDataRow.winner,
-          justification: trialDataRow.justification || "",
+          justification: utilities.formatFighterNames(trialDataRow.justification) || "",
         };
 
         console.log("Loaded trial data from server for trial", currentTrial);

@@ -57,7 +57,7 @@ function initializeSessionState(sessionID, mode) {
         // Initialize session state with AI mode data
         sessionStates.set(sessionID, {
           currentTrial: 1,
-          totalTrials: 5, // For testing (use 50 in production)
+          totalTrials: 50, // For testing (use 50 in production)
           currentPhase: mode === "group" ? PHASES.GROUP_DELIB : PHASES.INITIAL,
           phaseStartTime: Date.now(),
           mode: mode,
@@ -100,7 +100,7 @@ function initializeSessionState(sessionID, mode) {
       // Fallback initialization
       sessionStates.set(sessionID, {
         currentTrial: 1,
-        totalTrials: 5,
+        totalTrials: 50,
         currentPhase: mode === "group" ? PHASES.GROUP_DELIB : PHASES.INITIAL,
         phaseStartTime: Date.now(),
         mode: mode,
