@@ -12,7 +12,7 @@ const CONFIG = {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'ws://localhost:8080';
     } else {
-      return 'wss://ec2-44-202-125-67.compute-1.amazonaws.com';
+      return 'ws://ec2-44-202-125-67.compute-1.amazonaws.com';
     }
   }() 
 };
