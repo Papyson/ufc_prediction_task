@@ -3,12 +3,24 @@ const http = require("http");
 const WebSocket = require("ws");
 const sessionManager = require("./session");
 const { firestore } = require("./firebaseConfig");
+const path = require('path');
 
 const app = express();
+
+const exportCsvRouter = require('./routes/exportCsv');
+
+// Mount the CSV route (no auth, link only protects it)
+app.use('/exportCsv', exportCsvRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).send('ok');
 });
+
+// Serve the researcher download page
+app.get('/downloads', (req, res) => {
+  res.sendFile(path.join(__dirname, '../downloads.html'));
+});
+
 
 const server = http.createServer(app);
 
@@ -96,8 +108,27 @@ function initializeSessionState(sessionID, mode) {
 
         if (sessionData.csvFilePath) {
           try {
-            const trialData = await sessionManager.readCsvFile(sessionData.csvFilePath);
+            // Read the raw csv
+            const rawData = await sessionManager.readCsvFile(sessionData.csvFilePath);
 
+            //Apply trialOrder if present
+            let trialData;
+            if (Array.isArray(sessionData.trialOrder) &&
+              sessionData.trialOrder.length === rawData.length) {
+              trialData = sessionData.trialOrder.map(idx => rawData[idx]);
+              console.log(
+                `Applied trialOrder for session ${sessionID}: [${sessionData.trialOrder.join(',')}]`
+              );
+            } else {
+              trialData = rawData;
+              if (sessionData.trialOrder) {
+                console.warn(
+                  `Invalid trialOrder for session ${sessionID}, falling back to raw order.`
+                );
+              }
+            }
+
+            // Store into session state
             const state = sessionStates.get(sessionID);
             if (state) {
               state.trialData = trialData;

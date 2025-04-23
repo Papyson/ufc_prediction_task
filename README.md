@@ -1,21 +1,53 @@
-your-project/
-├── index.html              // Main HTML file that loads CSS and JS
-├── style.css               // Global styling for your experiment
-├── main.js                 // Entry point to initialize modules and start the experiment
-├── config.js               // Global configuration (API keys, WebSocket URL, etc.)
-│
-├── data/                   // Data files for conditions (e.g., goodAI.json, badAI.json)
-│
-├── modules/                // Frontend JavaScript modules
-│   ├── preTask.js          // Pre-task logic: survey, waiting room, routing
-│   ├── trialPhase.js       // Trial logic (to be implemented later)
-│   ├── postTask.js         // Post-task logic (survey, data download)
-│   ├── chat.js             // Chat functionality integrated with WebSocket
-│   ├── utilities.js        // Helper functions (data saving, wallet updates)
-│   └── session.js          // Session management (start/end session)
-│
-├── backend/                // Backend code for WebSocket server
-│   └── server.js           // Node.js WebSocket server implementation
-│
-└── README.md               // Documentation for deploying the experiment on Pavlovia
+# UFC Prediction Task Platform
+A web-based platform for solo and group UFC fight prediction experiments.
+
+## Features
+- Randomized trial order per session, preserving original order for export
+- Solo & group sessions with AI rationales (`goodAI`, `badAI`, `neutralAI`)
+- Real-time phases & chat via WebSocket
+- Pre- and post-task surveys
+- One-click CSV export of all solo or group data
+
+## Quick Start
+1. **Install**
+   ```bash
+   git clone <https://github.com/Papyson/ufc_prediction_task.git>
+   cd ufc-prediction-platform
+   npm install
+   ```
+2. **Configure** Firestore credentials in `firebaseConfig.js` or via environment variables.
+3. **Run**
+   ```bash
+   nodemon Backend/server.js
+   ```
+4. **Access**
+   - Participant UI: `http://api.mental-model-task.xyz`
+   - Researcher downloads: `http://api.mental-model-task.xyz/downloads.html`
+   - Solo CSV: `http://api.mental-model-task.xyz/exportCsv?mode=solo`
+   - Group CSV: `http://api.mental-model-task.xyz/exportCsv?mode=group`
+
+## Project Structure
+```
+Backend/       # server.js, session logic, routes
+  routes/
+    exportCsv.js
+  shuffleHelper.js
+Assets/        # static assets
+data/          # trial CSVs by AI mode
+downloads.html # download page
+index.html     # experiment loader
+modules/       # front-end scripts
+```
+
+## Data Export Logic
+- Stores `trialOrder` in Firestore for each session
+- `exportCsv` endpoint inverts `trialOrder` to output CSV in original sequence
+
+## Contributing
+Fork, branch, PR.
+
+---
+MIT License
+
+
 
