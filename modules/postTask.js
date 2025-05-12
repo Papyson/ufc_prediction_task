@@ -111,7 +111,7 @@ const postTask = (function () {
     ).textContent = `Total Winnings: $${finalWallet}`;
 
     const countdownEl = document.getElementById("posttask-countdown");
-    let remainTime = 30; // countdown duration in seconds
+    let remainTime = 60; // countdown duration in seconds
     countdownEl.textContent = `Session ending in ${remainTime} seconds`;
 
     const countdownInterval = setInterval(() => {
