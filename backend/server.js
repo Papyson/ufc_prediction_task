@@ -38,8 +38,8 @@ server.listen(PORT, () => {
 });
 
 const ONBOARDING_DURATIONS = {
-  solo: 122000,    // 4 items * 30 seconds + 2 second buffer = 122 seconds
-  group: 182000    // 6 items * 30 seconds + 2 second buffer = 182 seconds
+  solo: 82000,    // 4 items * 20 seconds + 2 second buffer = 82 seconds
+  group: 122000    // 6 items * 20 seconds + 2 second buffer = 122 seconds
 };
 
 // Trial phase constants

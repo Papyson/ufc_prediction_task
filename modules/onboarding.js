@@ -7,7 +7,7 @@ const onboarding = (() => {
     let onboardingCountdownInterval = null;
   
     const ONBOARDING_CONFIG = {
-      itemDuration: 30, // 30 seconds per intro item
+      itemDuration: 20, // 20 seconds per intro item
       syncBuffer: 2, // 2 seconds buffer for synchronization
       solo: {
         totalScreens: 2,
@@ -49,18 +49,18 @@ const onboarding = (() => {
       onboardingScreen.style.display = "none";
   
       onboardingScreen.innerHTML = `
-        <div id="onboarding-countdown-display" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; border: 2px solid #ffcc00; display: none;">
-          <div style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">Onboarding Timer</div>
-          <div id="onboarding-countdown-timer" style="color: #fff; font-size: 1.3em; text-align: center;">--:--</div>
-        </div>
-        <h2 id="onboarding-title">Getting Ready...</h2>
-        <div id="onboarding-content">
-          <p>Preparing your onboarding experience...</p>
-        </div>
-        <div id="onboarding-sync-status" style="text-align: center; margin-top: 20px;">
-          <p>Synchronizing with other participants...</p>
-        </div>
-      `;
+          <div id="onboarding-countdown-display" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; border: 2px solid #ffcc00; display: none;">
+            <div style="color: #ffcc00; font-weight: bold; font-size: 1.1em;">Onboarding Timer</div>
+            <div id="onboarding-countdown-timer" style="color: #fff; font-size: 1.3em; text-align: center;">--:--</div>
+          </div>
+          <h2 id="onboarding-title">Getting Ready...</h2>
+          <div id="onboarding-content">
+            <p>Preparing your onboarding experience...</p>
+          </div>
+          <div id="onboarding-sync-status" style="text-align: center; margin-top: 20px;">
+            <p>Synchronizing with other participants...</p>
+          </div>
+        `;
   
       appContainer.appendChild(onboardingScreen);
     }
@@ -192,389 +192,389 @@ const onboarding = (() => {
       document.getElementById("onboarding-title").textContent =
         "Solo Mode - Initial Bet Phase";
       document.getElementById("onboarding-content").innerHTML = `
-      <div class="onboarding-preview">
-        <div id="mock-initial-screen" class="mock-screen">
-          <div id="mock-wallet" class="mock-element">
-            <p><strong>💰 Wallet: $100</strong></p>
-          </div>
-          <div id="mock-fighter-table" class="mock-element">
-            <table class="fighter-table mock-table">
-              <thead>
-                <tr>
-                  <th>Stat</th>
-                  <th class="winner-column">Fighter A</th>
-                  <th>Fighter B</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="rationale-row">
-                  <td>Career Wins</td>
-                  <td class="winner-column-cell">15</td>
-                  <td>12</td>
-                </tr>
-                <tr>
-                  <td>Career Losses</td>
-                  <td class="winner-column-cell">3</td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td>Age</td>
-                  <td class="winner-column-cell">28 yrs</td>
-                  <td>31 yrs</td>
-                </tr>
-                <tr>
-                  <td>Height</td>
-                  <td class="winner-column-cell">6'2"</td>
-                  <td>6'0"</td>
-                </tr>
-                <tr>
-                  <td>Strikes Landed/Min</td>
-                  <td class="winner-column-cell">4.2/min</td>
-                  <td>3.8/min</td>
-                </tr>
-                <tr>
-                  <td>Strike Accuracy</td>
-                  <td class="winner-column-cell">65%</td>
-                  <td>58%</td>
-                </tr>
-                <tr>
-                  <td>Strike Defense</td>
-                  <td class="winner-column-cell">72%</td>
-                  <td>68%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Accuracy</td>
-                  <td class="winner-column-cell">85%</td>
-                  <td>78%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Defense</td>
-                  <td class="winner-column-cell">88%</td>
-                  <td>82%</td>
-                </tr>
-                <tr>
-                  <td>Strikes Avoided/Min</td>
-                  <td class="winner-column-cell">2.1/min</td>
-                  <td>2.5/min</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div id="mock-ai-prediction" class="mock-element ai-highlight">
-            <p><strong>AI Prediction:</strong> Fighter A to win</p>
-            <p><strong>Explanation:</strong> Fighter A has superior win record and experience advantage with better striking accuracy.</p>
-          </div>
-          <div id="mock-initial-wager" class="mock-element wager-slider-container">
-            <label>Initial Bet (0-4): <span>2</span></label>
-            <input type="range" min="0" max="4" value="2" disabled />
-            <button disabled>Confirm Initial Bet</button>
-          </div>
-        </div>
-      </div>
-    `;
-    }
-  
-    function createSoloFinalScreen() {
-      document.getElementById("onboarding-title").textContent =
-        "Solo Mode - Final Bet Phase";
-      document.getElementById("onboarding-content").innerHTML = `
-      <div class="onboarding-preview">
-        <div id="mock-final-screen" class="mock-screen">
-          <div id="mock-final-wallet" class="mock-element">
-            <p><strong>💰 Wallet: $100</strong></p>
-          </div>
-          <div class="mock-element">
-            <table class="fighter-table mock-table">
-              <thead>
-                <tr>
-                  <th>Stat</th>
-                  <th class="winner-column">Fighter A</th>
-                  <th>Fighter B</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="rationale-row">
-                  <td>Career Wins</td>
-                  <td class="winner-column-cell">15</td>
-                  <td>12</td>
-                </tr>
-                <tr>
-                  <td>Career Losses</td>
-                  <td class="winner-column-cell">3</td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td>Age</td>
-                  <td class="winner-column-cell">28 yrs</td>
-                  <td>31 yrs</td>
-                </tr>
-                <tr>
-                  <td>Height</td>
-                  <td class="winner-column-cell">6'2"</td>
-                  <td>6'0"</td>
-                </tr>
-                <tr>
-                  <td>Strikes Landed/Min</td>
-                  <td class="winner-column-cell">4.2/min</td>
-                  <td>3.8/min</td>
-                </tr>
-                <tr>
-                  <td>Strike Accuracy</td>
-                  <td class="winner-column-cell">65%</td>
-                  <td>58%</td>
-                </tr>
-                <tr>
-                  <td>Strike Defense</td>
-                  <td class="winner-column-cell">72%</td>
-                  <td>68%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Accuracy</td>
-                  <td class="winner-column-cell">85%</td>
-                  <td>78%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Defense</td>
-                  <td class="winner-column-cell">88%</td>
-                  <td>82%</td>
-                </tr>
-                <tr>
-                  <td>Strikes Avoided/Min</td>
-                  <td class="winner-column-cell">2.1/min</td>
-                  <td>2.5/min</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="ai-highlight">
-              <p><strong>AI Prediction:</strong> Fighter A to win</p>
-              <p><strong>Explanation:</strong> Same information and AI prediction as before...</p>
-            </div>
-          </div>
-          <div id="mock-final-wager" class="mock-element wager-slider-container">
-            <label>Final Bet (0-4): <span>2</span></label>
-            <input type="range" min="0" max="4" value="2" disabled />
-            <button disabled>Confirm Final Bet</button>
-          </div>
-        </div>
-      </div>
-    `;
-    }
-  
-    function createGroupInitialScreen() {
-      document.getElementById("onboarding-title").textContent =
-        "Group Mode - Initial Bet Phase";
-      document.getElementById("onboarding-content").innerHTML = `
-      <div class="onboarding-preview">
-        <div id="mock-group-initial" class="mock-screen">
-          <div id="mock-group-wallet" class="mock-element">
-            <p><strong>💰 Wallet: $100</strong></p>
-          </div>
-          <div id="mock-group-fighter-table" class="mock-element">
-            <table class="fighter-table mock-table">
-              <thead>
-                <tr>
-                  <th>Stat</th>
-                  <th class="winner-column">Fighter A</th>
-                  <th>Fighter B</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="rationale-row">
-                  <td>Career Wins</td>
-                  <td class="winner-column-cell">15</td>
-                  <td>12</td>
-                </tr>
-                <tr>
-                  <td>Career Losses</td>
-                  <td class="winner-column-cell">3</td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td>Age</td>
-                  <td class="winner-column-cell">28 yrs</td>
-                  <td>31 yrs</td>
-                </tr>
-                <tr>
-                  <td>Height</td>
-                  <td class="winner-column-cell">6'2"</td>
-                  <td>6'0"</td>
-                </tr>
-                <tr>
-                  <td>Strikes Landed/Min</td>
-                  <td class="winner-column-cell">4.2/min</td>
-                  <td>3.8/min</td>
-                </tr>
-                <tr>
-                  <td>Strike Accuracy</td>
-                  <td class="winner-column-cell">65%</td>
-                  <td>58%</td>
-                </tr>
-                <tr>
-                  <td>Strike Defense</td>
-                  <td class="winner-column-cell">72%</td>
-                  <td>68%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Accuracy</td>
-                  <td class="winner-column-cell">85%</td>
-                  <td>78%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Defense</td>
-                  <td class="winner-column-cell">88%</td>
-                  <td>82%</td>
-                </tr>
-                <tr>
-                  <td>Strikes Avoided/Min</td>
-                  <td class="winner-column-cell">2.1/min</td>
-                  <td>2.5/min</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div id="mock-group-ai" class="mock-element ai-highlight">
-            <p><strong>AI Prediction:</strong> Fighter A to win</p>
-            <p><strong>Explanation:</strong> Fighter A has superior win record and striking accuracy.</p>
-          </div>
-          <div id="mock-group-wager" class="mock-element">
-            <label>Your Bet (0-4): <span>2</span></label>
-            <input type="range" min="0" max="4" value="2" disabled />
-            <button disabled>Confirm Bet</button>
-          </div>
-        </div>
-      </div>
-    `;
-    }
-  
-    function createGroupChatScreen() {
-      document.getElementById("onboarding-title").textContent =
-        "Group Mode - Group Bets & Chat Phase";
-      document.getElementById("onboarding-content").innerHTML = `
         <div class="onboarding-preview">
-          <div id="mock-group-wagers" class="mock-screen">
-            <div id="mock-wagers-display" class="mock-element confirmed-wagers-display">
-              <h4 class="wagers-title">Initial Bets</h4>
-              <div class="wagers-container">
-                <div class="wager-column my-wager">
-                  <div class="wager-participant-id">You 🤹‍♂️</div>
-                  <div class="wager-value">2</div>
-                </div>
-                <div class="wager-column">
-                  <div class="wager-participant-id">Player 2 🤹‍♂️</div>
-                  <div class="wager-value">3</div>
-                </div>
-                <div class="wager-column">
-                  <div class="wager-participant-id">Player 3 🤹‍♂️</div>
-                  <div class="wager-value">1</div>
-                </div>
-              </div>
+          <div id="mock-initial-screen" class="mock-screen">
+            <div id="mock-wallet" class="mock-element">
+              <p><strong>💰 Wallet: $100</strong></p>
             </div>
-            <div id="mock-chat" class="mock-element">
-              <h4>Group Chat</h4>
-              <div class="chat-container">
-                <div class="chat-message">
-                  <span class="user-name">Player 2 🤹‍♂️:</span>
-                  <span class="message-text">I think Fighter A's experience is key</span>
-                </div>
-                <div class="chat-message">
-                  <span class="user-name">Player 3 🤹‍♂️:</span>
-                  <span class="message-text">But Fighter B is younger and faster</span>
-                </div>
-              </div>
-              <div class="chat-input">
-                <input type="text" placeholder="Type your opinion..." disabled />
-                <button disabled>Send</button>
-              </div>
+            <div id="mock-fighter-table" class="mock-element">
+              <table class="fighter-table mock-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th class="winner-column">Fighter A</th>
+                    <th>Fighter B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="rationale-row">
+                    <td>Career Wins</td>
+                    <td class="winner-column-cell">15</td>
+                    <td>12</td>
+                  </tr>
+                  <tr>
+                    <td>Career Losses</td>
+                    <td class="winner-column-cell">3</td>
+                    <td>4</td>
+                  </tr>
+                  <tr>
+                    <td>Age</td>
+                    <td class="winner-column-cell">28 yrs</td>
+                    <td>31 yrs</td>
+                  </tr>
+                  <tr>
+                    <td>Height</td>
+                    <td class="winner-column-cell">6'2"</td>
+                    <td>6'0"</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Landed/Min</td>
+                    <td class="winner-column-cell">4.2/min</td>
+                    <td>3.8/min</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Accuracy</td>
+                    <td class="winner-column-cell">65%</td>
+                    <td>58%</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Defense</td>
+                    <td class="winner-column-cell">72%</td>
+                    <td>68%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Accuracy</td>
+                    <td class="winner-column-cell">85%</td>
+                    <td>78%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Defense</td>
+                    <td class="winner-column-cell">88%</td>
+                    <td>82%</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Avoided/Min</td>
+                    <td class="winner-column-cell">2.1/min</td>
+                    <td>2.5/min</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="mock-ai-prediction" class="mock-element ai-highlight">
+              <p><strong>AI Prediction:</strong> Fighter A to win</p>
+              <p><strong>Explanation:</strong> Fighter A has superior win record and experience advantage with better striking accuracy.</p>
+            </div>
+            <div id="mock-initial-wager" class="mock-element wager-slider-container">
+              <label>Initial Bet (0-4): <span>2</span></label>
+              <input type="range" min="0" max="4" value="2" disabled />
+              <button disabled>Confirm Initial Bet</button>
             </div>
           </div>
         </div>
       `;
     }
   
+    function createSoloFinalScreen() {
+      document.getElementById("onboarding-title").textContent =
+        "Solo Mode - Final Bet Phase";
+      document.getElementById("onboarding-content").innerHTML = `
+        <div class="onboarding-preview">
+          <div id="mock-final-screen" class="mock-screen">
+            <div id="mock-final-wallet" class="mock-element">
+              <p><strong>💰 Wallet: $100</strong></p>
+            </div>
+            <div class="mock-element">
+              <table class="fighter-table mock-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th class="winner-column">Fighter A</th>
+                    <th>Fighter B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="rationale-row">
+                    <td>Career Wins</td>
+                    <td class="winner-column-cell">15</td>
+                    <td>12</td>
+                  </tr>
+                  <tr>
+                    <td>Career Losses</td>
+                    <td class="winner-column-cell">3</td>
+                    <td>4</td>
+                  </tr>
+                  <tr>
+                    <td>Age</td>
+                    <td class="winner-column-cell">28 yrs</td>
+                    <td>31 yrs</td>
+                  </tr>
+                  <tr>
+                    <td>Height</td>
+                    <td class="winner-column-cell">6'2"</td>
+                    <td>6'0"</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Landed/Min</td>
+                    <td class="winner-column-cell">4.2/min</td>
+                    <td>3.8/min</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Accuracy</td>
+                    <td class="winner-column-cell">65%</td>
+                    <td>58%</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Defense</td>
+                    <td class="winner-column-cell">72%</td>
+                    <td>68%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Accuracy</td>
+                    <td class="winner-column-cell">85%</td>
+                    <td>78%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Defense</td>
+                    <td class="winner-column-cell">88%</td>
+                    <td>82%</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Avoided/Min</td>
+                    <td class="winner-column-cell">2.1/min</td>
+                    <td>2.5/min</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="ai-highlight">
+                <p><strong>AI Prediction:</strong> Fighter A to win</p>
+                <p><strong>Explanation:</strong> Same information and AI prediction as before...</p>
+              </div>
+            </div>
+            <div id="mock-final-wager" class="mock-element wager-slider-container">
+              <label>Final Bet (0-4): <span>2</span></label>
+              <input type="range" min="0" max="4" value="2" disabled />
+              <button disabled>Confirm Final Bet</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  
+    function createGroupInitialScreen() {
+      document.getElementById("onboarding-title").textContent =
+        "Group Mode - Initial Bet Phase";
+      document.getElementById("onboarding-content").innerHTML = `
+        <div class="onboarding-preview">
+          <div id="mock-group-initial" class="mock-screen">
+            <div id="mock-group-wallet" class="mock-element">
+              <p><strong>💰 Wallet: $100</strong></p>
+            </div>
+            <div id="mock-group-fighter-table" class="mock-element">
+              <table class="fighter-table mock-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th class="winner-column">Fighter A</th>
+                    <th>Fighter B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="rationale-row">
+                    <td>Career Wins</td>
+                    <td class="winner-column-cell">15</td>
+                    <td>12</td>
+                  </tr>
+                  <tr>
+                    <td>Career Losses</td>
+                    <td class="winner-column-cell">3</td>
+                    <td>4</td>
+                  </tr>
+                  <tr>
+                    <td>Age</td>
+                    <td class="winner-column-cell">28 yrs</td>
+                    <td>31 yrs</td>
+                  </tr>
+                  <tr>
+                    <td>Height</td>
+                    <td class="winner-column-cell">6'2"</td>
+                    <td>6'0"</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Landed/Min</td>
+                    <td class="winner-column-cell">4.2/min</td>
+                    <td>3.8/min</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Accuracy</td>
+                    <td class="winner-column-cell">65%</td>
+                    <td>58%</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Defense</td>
+                    <td class="winner-column-cell">72%</td>
+                    <td>68%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Accuracy</td>
+                    <td class="winner-column-cell">85%</td>
+                    <td>78%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Defense</td>
+                    <td class="winner-column-cell">88%</td>
+                    <td>82%</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Avoided/Min</td>
+                    <td class="winner-column-cell">2.1/min</td>
+                    <td>2.5/min</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="mock-group-ai" class="mock-element ai-highlight">
+              <p><strong>AI Prediction:</strong> Fighter A to win</p>
+              <p><strong>Explanation:</strong> Fighter A has superior win record and striking accuracy.</p>
+            </div>
+            <div id="mock-group-wager" class="mock-element">
+              <label>Your Bet (0-4): <span>2</span></label>
+              <input type="range" min="0" max="4" value="2" disabled />
+              <button disabled>Confirm Bet</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  
+    function createGroupChatScreen() {
+      document.getElementById("onboarding-title").textContent =
+        "Group Mode - Group Bets & Chat Phase";
+      document.getElementById("onboarding-content").innerHTML = `
+          <div class="onboarding-preview">
+            <div id="mock-group-wagers" class="mock-screen">
+              <div id="mock-wagers-display" class="mock-element confirmed-wagers-display">
+                <h4 class="wagers-title">Initial Bets</h4>
+                <div class="wagers-container">
+                  <div class="wager-column my-wager">
+                    <div class="wager-participant-id">You 🤹‍♂️</div>
+                    <div class="wager-value">2</div>
+                  </div>
+                  <div class="wager-column">
+                    <div class="wager-participant-id">Player 2 🤹‍♂️</div>
+                    <div class="wager-value">3</div>
+                  </div>
+                  <div class="wager-column">
+                    <div class="wager-participant-id">Player 3 🤹‍♂️</div>
+                    <div class="wager-value">1</div>
+                  </div>
+                </div>
+              </div>
+              <div id="mock-chat" class="mock-element">
+                <h4>Group Chat</h4>
+                <div class="chat-container">
+                  <div class="chat-message">
+                    <span class="user-name">Player 2 🤹‍♂️:</span>
+                    <span class="message-text">I think Fighter A's experience is key</span>
+                  </div>
+                  <div class="chat-message">
+                    <span class="user-name">Player 3 🤹‍♂️:</span>
+                    <span class="message-text">But Fighter B is younger and faster</span>
+                  </div>
+                </div>
+                <div class="chat-input">
+                  <input type="text" placeholder="Type your opinion..." disabled />
+                  <button disabled>Send</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+  
     function createGroupFinalScreen() {
       document.getElementById("onboarding-title").textContent =
         "Group Mode - Final Bet Phase";
       document.getElementById("onboarding-content").innerHTML = `
-      <div class="onboarding-preview">
-        <div id="mock-group-final" class="mock-screen">
-          <div class="mock-element">
-            <p><strong>💰 Wallet: $100</strong></p>
-          </div>
-          <div class="mock-element">
-            <table class="fighter-table mock-table">
-              <thead>
-                <tr>
-                  <th>Stat</th>
-                  <th class="winner-column">Fighter A</th>
-                  <th>Fighter B</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="rationale-row">
-                  <td>Career Wins</td>
-                  <td class="winner-column-cell">15</td>
-                  <td>12</td>
-                </tr>
-                <tr>
-                  <td>Career Losses</td>
-                  <td class="winner-column-cell">3</td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td>Age</td>
-                  <td class="winner-column-cell">28 yrs</td>
-                  <td>31 yrs</td>
-                </tr>
-                <tr>
-                  <td>Height</td>
-                  <td class="winner-column-cell">6'2"</td>
-                  <td>6'0"</td>
-                </tr>
-                <tr>
-                  <td>Strikes Landed/Min</td>
-                  <td class="winner-column-cell">4.2/min</td>
-                  <td>3.8/min</td>
-                </tr>
-                <tr>
-                  <td>Strike Accuracy</td>
-                  <td class="winner-column-cell">65%</td>
-                  <td>58%</td>
-                </tr>
-                <tr>
-                  <td>Strike Defense</td>
-                  <td class="winner-column-cell">72%</td>
-                  <td>68%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Accuracy</td>
-                  <td class="winner-column-cell">85%</td>
-                  <td>78%</td>
-                </tr>
-                <tr>
-                  <td>Takedown Defense</td>
-                  <td class="winner-column-cell">88%</td>
-                  <td>82%</td>
-                </tr>
-                <tr>
-                  <td>Strikes Avoided/Min</td>
-                  <td class="winner-column-cell">2.1/min</td>
-                  <td>2.5/min</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="ai-highlight">
-              <p><strong>AI Prediction:</strong> Fighter A to win</p>
-              <p><strong>Explanation:</strong> Same AI prediction and explanation as discussed in chat...</p>
+        <div class="onboarding-preview">
+          <div id="mock-group-final" class="mock-screen">
+            <div class="mock-element">
+              <p><strong>💰 Wallet: $100</strong></p>
+            </div>
+            <div class="mock-element">
+              <table class="fighter-table mock-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th class="winner-column">Fighter A</th>
+                    <th>Fighter B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="rationale-row">
+                    <td>Career Wins</td>
+                    <td class="winner-column-cell">15</td>
+                    <td>12</td>
+                  </tr>
+                  <tr>
+                    <td>Career Losses</td>
+                    <td class="winner-column-cell">3</td>
+                    <td>4</td>
+                  </tr>
+                  <tr>
+                    <td>Age</td>
+                    <td class="winner-column-cell">28 yrs</td>
+                    <td>31 yrs</td>
+                  </tr>
+                  <tr>
+                    <td>Height</td>
+                    <td class="winner-column-cell">6'2"</td>
+                    <td>6'0"</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Landed/Min</td>
+                    <td class="winner-column-cell">4.2/min</td>
+                    <td>3.8/min</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Accuracy</td>
+                    <td class="winner-column-cell">65%</td>
+                    <td>58%</td>
+                  </tr>
+                  <tr>
+                    <td>Strike Defense</td>
+                    <td class="winner-column-cell">72%</td>
+                    <td>68%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Accuracy</td>
+                    <td class="winner-column-cell">85%</td>
+                    <td>78%</td>
+                  </tr>
+                  <tr>
+                    <td>Takedown Defense</td>
+                    <td class="winner-column-cell">88%</td>
+                    <td>82%</td>
+                  </tr>
+                  <tr>
+                    <td>Strikes Avoided/Min</td>
+                    <td class="winner-column-cell">2.1/min</td>
+                    <td>2.5/min</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="ai-highlight">
+                <p><strong>AI Prediction:</strong> Fighter A to win</p>
+                <p><strong>Explanation:</strong> Same AI prediction and explanation as discussed in chat...</p>
+              </div>
+            </div>
+            <div id="mock-group-final-wager" class="mock-element wager-slider-container">
+              <label>Final Bet (0-4): <span>2</span></label>
+              <input type="range" min="0" max="4" value="2" disabled />
+              <button disabled>Confirm Final Bet</button>
             </div>
           </div>
-          <div id="mock-group-final-wager" class="mock-element wager-slider-container">
-            <label>Final Bet (0-4): <span>2</span></label>
-            <input type="range" min="0" max="4" value="2" disabled />
-            <button disabled>Confirm Final Bet</button>
-          </div>
         </div>
-      </div>
-    `;
+      `;
     }
   
     function startIntroTour(steps, onComplete) {
@@ -779,20 +779,20 @@ const onboarding = (() => {
         "Onboarding Complete";
       document.getElementById("onboarding-content").innerHTML = `
       <div style="text-align: center; padding: 40px;">
-        <h3 style="color: #00ff00; margin-bottom: 20px;">✓ Onboarding Completed Successfully!</h3>
-        <p style="font-size: 1.1em; margin-bottom: 30px;">
+          <h3 style="color: #00ff00; margin-bottom: 20px;">✓ Onboarding Completed Successfully!</h3>
+          <p style="font-size: 1.1em; margin-bottom: 30px;">
           Great! You're now ready to start the ${
-            currentMode === "solo" ? "Solo" : "Group"
+              currentMode === "solo" ? "Solo" : "Group"
           } trials.
-        </p>
-        <div id="transition-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
+          </p>
+          <div id="transition-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
           Starting trials in <span id="countdown-timer">5</span> seconds...
-        </div>
-        <div style="margin-top: 20px; color: #aaa;">
+          </div>
+          <div style="margin-top: 20px; color: #aaa;">
           <p>The first trial will begin automatically.</p>
-        </div>
+          </div>
       </div>
-    `;
+      `;
   
       document.getElementById("onboarding-countdown-display").style.display =
         "none";
@@ -810,6 +810,16 @@ const onboarding = (() => {
           clearInterval(countdownInterval);
           onboardingInProgress = false;
           onboardingScreen.style.display = "none";
+  
+          setTimeout(() => {
+            const currentScreen = document.querySelector(
+              '.screen[style*="block"]'
+            );
+            if (!currentScreen || currentScreen.id === "onboarding-screen") {
+              console.log("Force showing trial screen after onboarding");
+              window.location.reload();
+            }
+          }, 1000);
         }
       }, 1000);
   

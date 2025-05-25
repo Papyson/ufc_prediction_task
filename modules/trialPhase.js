@@ -111,12 +111,10 @@ const trialPhase = (function () {
           console.warn("Result phase started but currentFightData is missing.");
         }
 
-        setTimeout(() => {
-          if (onboarding && onboarding.isOnboardingInProgress && onboarding.isOnboardingInProgress()) {
-            return;
-          }
-          
+        const forceShowScreen = () => {
           hideAllScreens();
+          
+          console.log(`Showing screen for phase: ${currentPhase}, subPhase: ${currentSubPhase}`);
           
           switch (currentPhase) {
             case "initial":
@@ -133,7 +131,17 @@ const trialPhase = (function () {
               break;
           }
           setupDynamicCountdown();
-        }, 100);
+          
+          setTimeout(() => {
+            const visibleScreen = document.querySelector('.screen[style*="block"]');
+            if (!visibleScreen) {
+              console.warn("No screen visible after transition, retrying...");
+              forceShowScreen();
+            }
+          }, 500);
+        };
+
+        setTimeout(forceShowScreen, 100);
       } else if (data.type === "rejoinSession") {
         clearAllTimers();
         window.aiMode = data.aiMode || null;
@@ -721,8 +729,11 @@ const trialPhase = (function () {
 function showTrialScreenSolo() {
   hideAllScreens();
   if (!initialScreen || !currentFightData) {
+    console.error("Cannot show solo screen - missing screen or data");
     return;
   }
+
+  console.log("Showing solo trial screen for trial", currentTrial);
 
   initialScreen.querySelector("#solo-trial-number").textContent = currentTrial;
   const confirmButton = initialScreen.querySelector("#btn-confirm-initial");
@@ -763,13 +774,25 @@ function showTrialScreenSolo() {
   });
 
   initialScreen.style.display = "block";
+  initialScreen.style.visibility = "visible";
+  
+  setTimeout(() => {
+    if (initialScreen.style.display !== "block") {
+      console.warn("Solo screen not visible, forcing display");
+      initialScreen.style.display = "block";
+      initialScreen.style.visibility = "visible";
+    }
+  }, 100);
 }
 
   function showGroupDelibScreen(rejoinWagers = null) {
     hideAllScreens();
     if (!groupDelibScreen || !currentFightData) {
+      console.error("Cannot show group screen - missing screen or data");
       return;
     }
+
+    console.log(`Showing group delib screen for trial ${currentTrial}, phase: ${currentPhase}, subPhase: ${currentSubPhase}`);
 
     groupDelibScreen.querySelector("#group-trial-number").textContent = currentTrial;
     const phaseTitle = groupDelibScreen.querySelector("#group-phase-title");
@@ -862,6 +885,15 @@ function showTrialScreenSolo() {
     }
 
     groupDelibScreen.style.display = "block";
+    groupDelibScreen.style.visibility = "visible";
+    
+    setTimeout(() => {
+      if (groupDelibScreen.style.display !== "block") {
+        console.warn("Group screen not visible, forcing display");
+        groupDelibScreen.style.display = "block";
+        groupDelibScreen.style.visibility = "visible";
+      }
+    }, 100);
   }
 
   function showFinalDecisionScreen() {
@@ -871,22 +903,19 @@ function showTrialScreenSolo() {
       return;
     }
 
-    finalDecisionScreen.querySelector("#final-trial-number").textContent =
-      currentTrial;
-    const confirmButton = finalDecisionScreen.querySelector(
-      "#btn-confirm-decision"
-    );
+    console.log("Showing final decision screen for trial", currentTrial);
+
+    finalDecisionScreen.querySelector("#final-trial-number").textContent = currentTrial;
+    const confirmButton = finalDecisionScreen.querySelector("#btn-confirm-decision");
     confirmButton.disabled = false;
     confirmButton.textContent = "Confirm Final Bet";
 
     finalWager = initialWager;
 
-    const contentEl = finalDecisionScreen.querySelector(
-      "#final-decision-content"
-    );
+    const contentEl = finalDecisionScreen.querySelector("#final-decision-content");
     const wallet = utilities.getWallet();
     contentEl.innerHTML = `
-      <p><strong>💰 Wallet::</strong> ${wallet}</p>
+      <p><strong>💰 Wallet:</strong> $${wallet}</p>
       ${generateFighterTableHTML()}
       <div class="ai-highlight">
         <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
@@ -919,6 +948,15 @@ function showTrialScreenSolo() {
     if (msgEl) msgEl.style.display = "none";
 
     finalDecisionScreen.style.display = "block";
+    finalDecisionScreen.style.visibility = "visible";
+    
+    setTimeout(() => {
+      if (finalDecisionScreen.style.display !== "block") {
+        console.warn("Final decision screen not visible, forcing display");
+        finalDecisionScreen.style.display = "block";
+        finalDecisionScreen.style.visibility = "visible";
+      }
+    }, 100);
   }
 
   function showResultScreen() {
@@ -927,12 +965,16 @@ function showTrialScreenSolo() {
       console.error("Result screen, fight data, or AI correctness not ready.");
       const contentEl = resultScreen?.querySelector("#result-content");
       if (contentEl) contentEl.innerHTML = "<p>Loading results...</p>";
-      if (resultScreen) resultScreen.style.display = "block";
+      if (resultScreen) {
+        resultScreen.style.display = "block";
+        resultScreen.style.visibility = "visible";
+      }
       return;
     }
 
-    resultScreen.querySelector("#result-trial-number").textContent =
-      currentTrial;
+    console.log("Showing result screen for trial", currentTrial);
+
+    resultScreen.querySelector("#result-trial-number").textContent = currentTrial;
     const nextButton = resultScreen.querySelector("#btn-next-trial");
     nextButton.disabled = false;
     nextButton.textContent = "Next Trial";
@@ -970,11 +1012,20 @@ function showTrialScreenSolo() {
       }</p>
       <p>${outcomeText}</p>
       <hr style="margin: 10px 0; border-color: #555;">
-      <p>💰 Wallet before: ${walletBefore}</p>
-      <p><strong>💰 Wallet after: ${walletAfter}</strong></p>
+      <p>💰 Wallet before: $${walletBefore}</p>
+      <p><strong>💰 Wallet after: $${walletAfter}</strong></p>
     `;
 
     resultScreen.style.display = "block";
+    resultScreen.style.visibility = "visible";
+    
+    setTimeout(() => {
+      if (resultScreen.style.display !== "block") {
+        console.warn("Result screen not visible, forcing display");
+        resultScreen.style.display = "block";
+        resultScreen.style.visibility = "visible";
+      }
+    }, 100);
 
     if (!trialDataSaved) {
       saveTrialData(walletBefore, walletAfter);
@@ -1021,11 +1072,21 @@ function showTrialScreenSolo() {
   }
 
   function hideAllScreens() {
-    document.querySelectorAll(".screen").forEach((screen) => {
-      if (screen && screen.id !== "onboarding-screen") {
+    const screens = document.querySelectorAll(".screen");
+    screens.forEach((screen) => {
+      if (screen) {
         screen.style.display = "none";
+        screen.style.visibility = "hidden";
       }
     });
+    
+    setTimeout(() => {
+      screens.forEach((screen) => {
+        if (screen && screen.id !== "onboarding-screen") {
+          screen.style.visibility = "visible";
+        }
+      });
+    }, 50);
   }
 
   function generateFighterTableHTML() {

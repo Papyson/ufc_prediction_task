@@ -5,7 +5,7 @@ const csv = require("csv-parser");
 const { admin, firestore } = require("./firebaseConfig");
 const { shuffleAndPersist } = require("./shuffleHelper");
 
-const WAITING_DURATION = 40000; // 40 seconds
+const WAITING_DURATION = 35000; // 35 seconds
 
 const AI_MODES = ["goodAI", "badAI", "neutralAI"];
 
