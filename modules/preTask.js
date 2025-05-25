@@ -3,7 +3,6 @@ const preTask = (function () {
   let preTaskScreen, waitingRoomScreen;
   let waitingTimerId;
   let ws;
-  let sessionInfo = null;
   let preTaskData = null;
   let hasRouted = false;
 
@@ -26,69 +25,73 @@ const preTask = (function () {
       <div class="feature-sliders">
         <div class="slider-group">
           <label>Career Wins (Total number of fights the fighter has won)</label>
-          <input type="range" id="slider-wins" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-wins" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Career Losses (Total number of fights the fighter has lost)</label>
-          <input type="range" id="slider-losses" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-losses" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Age (The fighter’s current age in years)</label>
-          <input type="range" id="slider-age" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-age" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Height (The fighter’s height, which can affect reach and leverage)</label>
-          <input type="range" id="slider-height" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-height" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Strikes Landed/Minute (Average number of strikes the fighter lands per minute)</label>
-          <input type="range" id="slider-slpm" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-slpm" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Strike Accuracy (Percentage of strikes that land successfully)</label>
-          <input type="range" id="slider-accuracy" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-accuracy" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Strike Defense (Percentage of opponent strikes the fighter avoids)</label>
-          <input type="range" id="slider-defense" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-defense" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Takedown Defense (Percentage of opponent takedown attempts successfully defended)</label>
-          <input type="range" id="slider-td-defense" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-td-defense" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Strikes Avoided/Minute (Average number of strikes the fighter avoids per minute)</label>
-          <input type="range" id="slider-sapm" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-sapm" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
         
         <div class="slider-group">
           <label>Takedown Accuracy (Percentage of takedown attempts that are successful)</label>
-          <input type="range" id="slider-td-accuracy" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="slider-td-accuracy" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
+      </div>
+
+      <div id="pretask-validation-error" style="display: none; color: #ff4444; text-align: center; margin: 20px 0; font-weight: bold; animation: shake 0.5s ease-in-out infinite;">
+        ⚠️ Please review and adjust all sliders above before proceeding!
       </div>
   
       <button id="btn-start-waiting">Submit Survey & Enter Waiting Room</button>
     `;
     appContainer.appendChild(preTaskScreen);
- 
+
     waitingRoomScreen = document.createElement("div");
     waitingRoomScreen.classList.add("screen");
     waitingRoomScreen.innerHTML = `
@@ -99,12 +102,34 @@ const preTask = (function () {
     `;
     appContainer.appendChild(waitingRoomScreen);
 
+    const sliderStates = new Map();
+
     preTaskScreen.querySelectorAll('input[type="range"]').forEach((slider) => {
       const valueDisplay = slider.nextElementSibling;
+      sliderStates.set(slider.id, false);
+
       slider.addEventListener("input", () => {
         valueDisplay.textContent = slider.value;
+        slider.dataset.moved = "true";
+        sliderStates.set(slider.id, true);
+        validateSliders();
       });
     });
+
+    function validateSliders() {
+      const allMoved = Array.from(sliderStates.values()).every(
+        (moved) => moved
+      );
+      const errorMessage = preTaskScreen.querySelector(
+        "#pretask-validation-error"
+      );
+
+      if (allMoved) {
+        errorMessage.style.display = "none";
+      }
+    }
+
+    validateSliders();
 
     preTaskScreen
       .querySelector("#btn-start-waiting")
@@ -118,33 +143,36 @@ const preTask = (function () {
         console.error("Invalid JSON received:", event.data);
         return;
       }
-      
-      if (data.type === "sessionStarted" || 
-          (data.type === "sessionUpdate" && data.status === "waiting")) {
+
+      if (
+        data.type === "sessionStarted" ||
+        (data.type === "sessionUpdate" && data.status === "waiting")
+      ) {
         console.log("Session started/waiting:", data);
         if (data.sessionID) {
           sessionStorage.setItem("sessionID", data.sessionID);
           sessionInfo = data;
           sendPreTaskSurveyData();
         }
-        
+
         if (data.mode === "waiting" || data.status === "waiting") {
-          const waitEndTime = data.waitingEndTime || (Date.now() + 30000);
+          const waitEndTime = data.waitingEndTime || Date.now() + 30000;
           startWaitingRoom(waitEndTime);
         } else {
-          // Session is already running (group or solo), hide waiting room
           waitingRoomScreen.style.display = "none";
         }
       } else if (data.type === "sessionUpdate") {
         console.log("Session update received:", data);
         if (data.status === "running") {
-          // Hide waiting room when session is running
           waitingRoomScreen.style.display = "none";
           if (!hasRouted) {
             finalizeWaitingRoom(data.mode);
             hasRouted = true;
           }
         }
+      } else if (data.type === "startOnboarding") {
+        hideAllScreens();
+        onboarding.startOnboarding(data.mode, data.sessionID);
       } else if (data.type === "participantCount") {
         console.log("Participant count update:", data.count);
       }
@@ -156,10 +184,31 @@ const preTask = (function () {
 
   function submitSurveyAndStartWaiting() {
     const name = preTaskScreen.querySelector("#survey-name").value;
+    const errorMessage = preTaskScreen.querySelector(
+      "#pretask-validation-error"
+    );
+
     if (!name) {
       alert("Please enter your name.");
       return;
     }
+
+    const sliders = preTaskScreen.querySelectorAll('input[type="range"]');
+    const allMoved = Array.from(sliders).every((slider) => {
+      return slider.dataset.moved === "true";
+    });
+
+    if (!allMoved) {
+      errorMessage.style.display = "block";
+      setTimeout(() => {
+        errorMessage.style.animation = "none";
+        setTimeout(() => {
+          errorMessage.style.animation = "shake 0.5s ease-in-out infinite";
+        }, 10);
+      }, 10);
+      return;
+    }
+
     sessionStorage.setItem("userName", name);
     const clientID = sessionStorage.getItem("PROLIFIC_PID") || name;
     preTaskData = {
@@ -228,7 +277,8 @@ const preTask = (function () {
         : "Proceeding to Solo Mode...";
     console.log("Routing to", mode, "mode.");
     hideAllScreens();
-    waitingRoomScreen.style.display = "block";  }
+    waitingRoomScreen.style.display = "block";
+  }
 
   function hideAllScreens() {
     document.querySelectorAll(".screen").forEach((screen) => {

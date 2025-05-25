@@ -28,6 +28,7 @@ const wss = new WebSocket.Server({ server });
 
 let clients = new Map();
 let clientUserNames = new Map();
+const onboardingStates = new Map();
 
 const PORT = process.env.PORT || 8080;
 
@@ -35,6 +36,11 @@ server.listen(PORT, () => {
   console.log(`Server running on PORT http ${PORT}`);
   console.log(`Websocket server running on PORT wss ${PORT}`);
 });
+
+const ONBOARDING_DURATIONS = {
+  solo: 122000,    // 4 items * 30 seconds + 2 second buffer = 122 seconds
+  group: 182000    // 6 items * 30 seconds + 2 second buffer = 182 seconds
+};
 
 // Trial phase constants
 const PHASE_DURATION = 15000; // 15 seconds for wager OR final decision OR result display
@@ -89,6 +95,12 @@ function initializeSessionState(sessionID, mode) {
 
   console.log(`Initializing state for session ${sessionID}, mode ${mode}`);
 
+  onboardingStates.set(sessionID, {
+    readyParticipants: new Set(),
+    startTime: null,
+    completed: false
+  });
+
   // Get the session data to access AI mode
   const getSessionData = async () => {
     try {
@@ -109,6 +121,7 @@ function initializeSessionState(sessionID, mode) {
             resultConfirmed: false,
             soloInitialConfirmed: false,
             chatMessages: [],
+            onboardingComplete: false,
           };
         });
 
@@ -116,7 +129,7 @@ function initializeSessionState(sessionID, mode) {
         sessionStates.set(sessionID, {
           currentTrial: 1,
           totalTrials: 50,
-          currentPhase: mode === "group" ? PHASES.GROUP_DELIB : PHASES.INITIAL,
+          currentPhase: "onboarding",
           currentSubPhase: mode === "group" ? "wager" : null,
           phaseStartTime: Date.now(),
           mode: mode,
@@ -127,6 +140,8 @@ function initializeSessionState(sessionID, mode) {
           csvFilePath: sessionData.csvFilePath || null,
           trialCount: sessionData.trialCount || 0,
           trialData: null,
+          onboardingInProgress: true,
+          onboardingTimeoutId: null,
         });
 
         console.log(
@@ -197,7 +212,7 @@ function initializeSessionState(sessionID, mode) {
         }
 
         setTimeout(() => {
-          startTrialPhase(sessionID);
+          startOnboardingPhase(sessionID);
         }, 500);
       } else {
         console.error(`Session document ${sessionID} does not exist.`);
@@ -212,11 +227,69 @@ function initializeSessionState(sessionID, mode) {
   getSessionData();
 }
 
+function startOnboardingPhase(sessionID) {
+  if (!sessionStates.has(sessionID)) {
+    return;
+  }
+
+  const state = sessionStates.get(sessionID);
+  const onboardingDuration = ONBOARDING_DURATIONS[state.mode];
+  
+  console.log(`Starting onboarding phase for session ${sessionID} (${state.mode} mode) - Duration: ${onboardingDuration}ms`);
+
+  broadcastToSession(sessionID, {
+    type: "startOnboarding",
+    sessionID: sessionID,
+    mode: state.mode,
+    duration: onboardingDuration,
+    startTime: Date.now(),
+  });
+
+  const timeoutId = setTimeout(() => {
+    completeOnboardingPhase(sessionID);
+  }, onboardingDuration);
+  
+  state.onboardingTimeoutId = timeoutId;
+  sessionStates.set(sessionID, state);
+}
+
+function completeOnboardingPhase(sessionID) {
+  if (!sessionStates.has(sessionID)) return;
+  
+  const state = sessionStates.get(sessionID);
+  console.log(`Completing onboarding phase for session ${sessionID}`);
+  
+  if (state.onboardingTimeoutId) {
+    clearTimeout(state.onboardingTimeoutId);
+    state.onboardingTimeoutId = null;
+  }
+  
+  state.onboardingInProgress = false;
+  state.currentPhase = state.mode === "group" ? "groupDelib" : "initial";
+  state.currentSubPhase = state.mode === "group" ? "wager" : null;
+  
+  sessionStates.set(sessionID, state);
+  
+  onboardingStates.delete(sessionID);
+  
+  broadcastToSession(sessionID, {
+    type: "onboardingComplete",
+    sessionID: sessionID,
+    mode: state.mode
+  });
+  
+  setTimeout(() => {
+    const currentState = sessionStates.get(sessionID);
+    if (currentState) {
+      currentState.phaseStartTime = Date.now();
+      sessionStates.set(sessionID, currentState);
+      startTrialPhase(sessionID);
+    }
+  }, 5000);
+}
+
 function startTrialPhase(sessionID) {
   if (!sessionStates.has(sessionID)) {
-    console.warn(
-      `Attempted to start trial phase for non-existent session state: ${sessionID}`
-    );
     return;
   }
 

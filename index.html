@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Fight Prediction Experiment</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Optionally include jsPsych or other libraries here
-       <script src="https://unpkg.com/jspsych/dist/jspsych.js"></script>
-       <link rel="stylesheet" href="https://unpkg.com/jspsych/dist/jspsych.css" />
-  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
-  <!-- Load global config if needed -->
+
   <script src="config.js"></script>
 
-  <!-- Include PapaParse from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
-  <!-- Load main scripts in order -->
   <script src="modules/utilities.js"></script>
   <script src="modules/preTask.js"></script>
   <script src="modules/chat.js"></script>
   <script src="modules/trialPhase.js"></script>
   <script src="modules/postTask.js"></script>
+  <script src="modules/onboarding.js"></script>
   <script src="main.js"></script>
 </head>
+
 <body>
   <div id="app-container">
-    <!-- The entire experiment will render inside this container -->
-    <!-- Pre-task, waiting room, trials, and post-task screens will be inserted dynamically by JS -->
   </div>
 </body>
+
 </html>

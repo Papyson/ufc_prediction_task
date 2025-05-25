@@ -51,6 +51,16 @@ const trialPhase = (function () {
     try {
       const data = JSON.parse(event.data);
 
+      if (data.type === "startOnboarding") {
+        onboarding.startOnboarding(data.mode, data.sessionID);
+        return;
+      }
+
+      if (data.type === "onboardingComplete") {
+        onboarding.completeOnboarding();
+        return;
+      }
+
       if (data.type === "sessionStarted" || data.type === "sessionUpdate") {
         if (data.sessionID) sessionID = data.sessionID;
         if (data.mode) isSolo = data.mode === "solo";
@@ -62,7 +72,7 @@ const trialPhase = (function () {
       } else if (data.type === "phaseChange") {
         clearAllTimers();
 
-         if (data.trial !== currentTrial && currentTrial !== 0) {
+        if (data.trial !== currentTrial && currentTrial !== 0) {
           initialWager = 2;
           finalWager = 2;
         }
@@ -96,29 +106,34 @@ const trialPhase = (function () {
         }
 
         if (currentPhase === "result" && currentFightData) {
-          serverAiCorrect =
-            currentFightData.winner ==
-            currentFightData.predicted_winner_numeric;
+          serverAiCorrect = currentFightData.winner == currentFightData.predicted_winner_numeric;
         } else if (currentPhase === "result") {
           console.warn("Result phase started but currentFightData is missing.");
         }
 
-        switch (currentPhase) {
-          case "initial":
-            showTrialScreenSolo();
-            break;
-          case "groupDelib":
-            showGroupDelibScreen();
-            break;
-          case "finalDecision":
-            showFinalDecisionScreen();
-            break;
-          case "result":
-            showResultScreen();
-            break;
-        }
-
-        setupDynamicCountdown();
+        setTimeout(() => {
+          if (onboarding && onboarding.isOnboardingInProgress && onboarding.isOnboardingInProgress()) {
+            return;
+          }
+          
+          hideAllScreens();
+          
+          switch (currentPhase) {
+            case "initial":
+              showTrialScreenSolo();
+              break;
+            case "groupDelib":
+              showGroupDelibScreen();
+              break;
+            case "finalDecision":
+              showFinalDecisionScreen();
+              break;
+            case "result":
+              showResultScreen();
+              break;
+          }
+          setupDynamicCountdown();
+        }, 100);
       } else if (data.type === "rejoinSession") {
         clearAllTimers();
         window.aiMode = data.aiMode || null;
@@ -703,54 +718,52 @@ const trialPhase = (function () {
     );
   }
 
-  function showTrialScreenSolo() {
-    hideAllScreens();
-    if (!initialScreen || !currentFightData) {
-      console.error("Initial screen or fight data not ready for solo trial.");
-      return;
-    }
-
-    initialScreen.querySelector("#solo-trial-number").textContent =
-      currentTrial;
-    document.getElementById("btn-confirm-initial").disabled = false;
-    document.getElementById("btn-confirm-initial").textContent =
-      "Confirm Initial Bet";
-
-    initialWager = 2;
-
-    const contentEl = initialScreen.querySelector("#initial-content");
-    const wallet = utilities.getWallet();
-    contentEl.innerHTML = `
-      <p><strong>💰 Wallet:</strong> $${wallet}</p>
-      ${generateFighterTableHTML()}
-      <div class="ai-highlight">
-        <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-        ${
-          window.aiMode !== "neutralAI"
-            ? `<p><strong>Explanation:</strong> ${
-                currentFightData.justification || "N/A"
-              }</p>`
-            : ""
-        }
-      </div>
-      <div class="wager-slider-container" style="margin-top: 20px;">
-        <label for="initial-wager-range">Initial Bet (0-4): <span id="initial-wager-value">${initialWager}</span></label>
-        <input type="range" min="0" max="4" step="1" value="${initialWager}" id="initial-wager-range" />
-      </div>
-    `;
-
-    const wagerSlider = contentEl.querySelector("#initial-wager-range");
-    wagerSlider.disabled = false;
-    wagerSlider.value = initialWager;
-    wagerSlider.addEventListener("input", (e) => {
-      if (!soloInitialConfirmed){
-        initialWager = parseInt(e.target.value, 10);
-        document.getElementById("initial-wager-value").textContent = initialWager;
-      }
-    });
-
-    initialScreen.style.display = "block";
+function showTrialScreenSolo() {
+  hideAllScreens();
+  if (!initialScreen || !currentFightData) {
+    return;
   }
+
+  initialScreen.querySelector("#solo-trial-number").textContent = currentTrial;
+  const confirmButton = initialScreen.querySelector("#btn-confirm-initial");
+  confirmButton.disabled = false;
+  confirmButton.textContent = "Confirm Initial Bet";
+
+  initialWager = 2;
+
+  const contentEl = initialScreen.querySelector("#initial-content");
+  const wallet = utilities.getWallet();
+  contentEl.innerHTML = `
+    <p><strong>💰 Wallet:</strong> $${wallet}</p>
+    ${generateFighterTableHTML()}
+    <div class="ai-highlight">
+      <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
+      ${
+        window.aiMode !== "neutralAI"
+          ? `<p><strong>Explanation:</strong> ${
+              currentFightData.justification || "N/A"
+            }</p>`
+          : ""
+      }
+    </div>
+    <div class="wager-slider-container" style="margin-top: 20px;">
+      <label for="initial-wager-range">Initial Bet (0-4): <span id="initial-wager-value">${initialWager}</span></label>
+      <input type="range" min="0" max="4" step="1" value="${initialWager}" id="initial-wager-range" />
+    </div>
+  `;
+
+  const wagerSlider = contentEl.querySelector("#initial-wager-range");
+  wagerSlider.disabled = false;
+  wagerSlider.value = initialWager;
+  wagerSlider.addEventListener("input", (e) => {
+    if (!soloInitialConfirmed){
+      initialWager = parseInt(e.target.value, 10);
+      document.getElementById("initial-wager-value").textContent = initialWager;
+    }
+  });
+
+  initialScreen.style.display = "block";
+}
 
   function showGroupDelibScreen(rejoinWagers = null) {
     hideAllScreens();
@@ -1009,7 +1022,9 @@ const trialPhase = (function () {
 
   function hideAllScreens() {
     document.querySelectorAll(".screen").forEach((screen) => {
-      if (screen) screen.style.display = "none";
+      if (screen && screen.id !== "onboarding-screen") {
+        screen.style.display = "none";
+      }
     });
   }
 

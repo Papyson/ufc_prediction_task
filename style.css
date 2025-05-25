@@ -53,10 +53,9 @@ button:hover {
   background: #e03e00;
 }
 button:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
+  background: #cccccc;
+  cursor: not-allowed;
 }
-
 
 /* Form elements */
 label {
@@ -83,13 +82,12 @@ label {
   margin-right: 6px;
 }
 .system-message {
-    font-style: italic;
-    color: #aaa;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    text-align: center;
+  font-style: italic;
+  color: #aaa;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
 }
-
 
 /* Wager Section */
 #wager-container,
@@ -101,7 +99,7 @@ label {
 }
 input[type="range"] {
   width: 100%;
-  max-width: 400px; 
+  max-width: 400px;
   cursor: pointer;
 }
 
@@ -145,7 +143,6 @@ input[type="range"] {
   text-align: center;
   margin-left: 10px;
 }
-
 
 body.modal-open {
   overflow: hidden;
@@ -288,10 +285,11 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
   cursor: pointer;
 }
 
-#wager-section, #chat-section {
+#wager-section,
+#chat-section {
   margin-top: 20px;
   padding-top: 15px;
-  border-top: 1px solid #555; 
+  border-top: 1px solid #555;
 }
 
 .wager-slider-container {
@@ -339,10 +337,10 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
 }
 
 .wager-column {
-  flex: 1; 
+  flex: 1;
   padding: 10px;
   text-align: center;
-  border-left: 1px solid #555; 
+  border-left: 1px solid #555;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -350,12 +348,12 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
 }
 
 .wager-column:first-child {
-  border-left: none; 
+  border-left: none;
 }
 
 .wager-participant-id {
   font-size: 0.9em;
-  color: #ccc; 
+  color: #ccc;
   margin-bottom: 5px;
   font-weight: normal;
 }
@@ -367,16 +365,16 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
 }
 
 .wager-column.my-wager {
-  background-color: rgba(255, 204, 0, 0.3); 
+  background-color: rgba(255, 204, 0, 0.3);
   border-radius: 4px;
 }
 
 .wager-column.my-wager .wager-participant-id {
-  color: #ffcc00; 
+  color: #ffcc00;
   font-weight: bold;
 }
 .wager-column.my-wager .wager-value {
-  color: #ffcc00; 
+  color: #ffcc00;
 }
 
 .waiting-message {
@@ -396,7 +394,7 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
   font-weight: bold;
   text-align: center;
   padding: 5px 0;
-  color: #ffcc00; 
+  color: #ffcc00;
 }
 
 .chat-input {
@@ -417,7 +415,7 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
 
 #chat-send-btn {
   padding: 8px 12px;
-  margin-left: -1px; 
+  margin-left: -1px;
   border-radius: 0 4px 4px 0;
   margin-top: 0;
 }
@@ -451,7 +449,7 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
 }
 
 .winner-column {
-  background-color:rgb(67, 33, 19) !important;
+  background-color: rgb(67, 33, 19) !important;
   position: relative;
 }
 
@@ -460,14 +458,15 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
 }
 
 .winner-column::after {
-  content: '👑';
+  content: "👑";
   position: absolute;
   top: 5px;
   right: 5px;
   font-size: 16px;
 }
 
-.winner-column, .winner-column-cell {
+.winner-column,
+.winner-column-cell {
   border: 2px solid rgba(255, 100, 100, 0.7) !important;
 }
 
@@ -530,22 +529,332 @@ body.modal-open > *:not(.modal-overlay):not(script):not(style) {
   color: #ffcc00;
 }
 
+.introjs-overlay {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.introjs-tooltip {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+  border: 2px solid #ffcc00 !important;
+  color: #fff !important;
+  max-width: 400px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+.introjs-tooltiptext {
+  color: #fff !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  font-family: "Roboto", sans-serif !important;
+}
+
+.introjs-arrow {
+  border-bottom-color: rgba(0, 0, 0, 0.95) !important;
+  border-top-color: rgba(0, 0, 0, 0.95) !important;
+  border-left-color: rgba(0, 0, 0, 0.95) !important;
+  border-right-color: rgba(0, 0, 0, 0.95) !important;
+}
+
+.introjs-button {
+  background-color: #ff4500 !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 10px 16px !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  margin: 5px !important;
+  font-family: "Roboto", sans-serif !important;
+  text-shadow: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.introjs-button:hover {
+  background-color: #e03e00 !important;
+}
+
+.introjs-button:focus {
+  background-color: #e03e00 !important;
+  outline: none !important;
+}
+
+.introjs-skipbutton {
+  display: none !important;
+}
+
+.introjs-prevbutton {
+  background-color: #666 !important;
+}
+
+.introjs-prevbutton:hover {
+  background-color: #555 !important;
+}
+
+.introjs-nextbutton {
+  background-color: #ff4500 !important;
+}
+
+.introjs-nextbutton:hover {
+  background-color: #e03e00 !important;
+}
+
+.introjs-donebutton {
+  background-color: #4caf50 !important;
+}
+
+.introjs-donebutton:hover {
+  background-color: #45a049 !important;
+}
+
+.introjs-bullets {
+  display: none !important;
+}
+
+.introjs-progress {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+}
+
+.introjs-progressbar {
+  background-color: #ffcc00 !important;
+  border-radius: 4px !important;
+}
+
+.introjs-helperNumberLayer {
+  background-color: #ff4500 !important;
+  border: 2px solid #ffcc00 !important;
+  color: #fff !important;
+  font-weight: bold !important;
+}
+
+.introjs-tooltipReferenceLayer {
+  background-color: transparent !important;
+  border: 2px solid #ffcc00 !important;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5) !important;
+}
+
+.onboarding-preview {
+  padding: 20px 0;
+}
+
+.mock-screen {
+  padding: 20px;
+  border: 2px dashed #ffcc00;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background: rgba(255, 204, 0, 0.05);
+}
+
+.mock-element {
+  margin: 15px 0;
+  opacity: 0.9;
+}
+
+.mock-table {
+  font-size: 0.9em;
+}
+
+.mock-element button {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.mock-element input[type="range"] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+#onboarding-countdown-display {
+  position: absolute !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  padding: 12px 16px !important;
+  border-radius: 6px !important;
+  border: 2px solid #ffcc00 !important;
+  z-index: 9999 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+#onboarding-countdown-display div:first-child {
+  color: #ffcc00 !important;
+  font-weight: bold !important;
+  font-size: 0.9em !important;
+  margin-bottom: 4px !important;
+  text-align: center !important;
+}
+
+#onboarding-countdown-timer {
+  color: #fff !important;
+  font-size: 1.4em !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  font-family: "Courier New", monospace !important;
+}
+
+.introjs-nextbutton,
+.introjs-prevbutton,
+.introjs-donebutton {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  border: 1px solid #999999 !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+
+.introjs-nextbutton:hover,
+.introjs-prevbutton:hover,
+.introjs-donebutton:hover {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+}
+
+.introjs-tooltipbuttons {
+  display: block !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+
+.introjs-progressbar {
+  background-color: #ffcc00 !important;
+  height: 4px !important;
+}
+
+.introjs-progress {
+  background-color: rgba(255, 204, 0, 0.3) !important;
+}
+
+.introjs-tooltip-title {
+  background-color: #ffcc00 !important;
+  color: #000 !important;
+  font-weight: bold !important;
+  font-size: 18px !important;
+  padding: 12px 16px !important;
+  margin: -16px -16px 12px -16px !important;
+  border-radius: 4px 4px 0 0 !important;
+  text-align: center !important;
+  font-family: "Roboto", sans-serif !important;
+  display: block !important;
+  width: calc(100% + 32px) !important;
+  margin-left: -16px !important;
+  margin-right: -16px !important;
+  box-sizing: border-box !important;
+}
+
+.introjs-tooltiptext ul {
+  margin: 10px 0 !important;
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.introjs-tooltiptext li {
+  margin: 8px 0 !important;
+  padding-left: 0 !important;
+}
+
+.introjs-tooltiptext strong {
+  color: #ffcc00 !important;
+  font-weight: bold !important;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
 @keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+#pretask-validation-error,
+#posttask-validation-error {
+  background-color: rgba(255, 68, 68, 0.1);
+  border: 2px solid #ff4444;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+button:disabled {
+  background-color: #cccccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+.slider-group.invalid {
+  background-color: rgba(255, 68, 68, 0.05);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 4px;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+.validation-error {
+  color: #ff4444;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(255, 68, 68, 0.1);
+  border: 2px solid #ff4444;
+  border-radius: 8px;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+button.validation-pending {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+button.validation-passed {
+  background-color: #ff4500 !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 @media (max-width: 768px) {
   .wagers-container {
-    flex-direction: column; 
+    flex-direction: column;
     align-items: center;
   }
   .wager-column {
     border-left: none;
     border-bottom: 1px solid #555;
-    width: 80%; 
-    margin-bottom: 5px; 
+    width: 80%;
+    margin-bottom: 5px;
   }
   .wager-column:last-child {
     border-bottom: none;

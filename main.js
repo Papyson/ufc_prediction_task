@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
     postTask.init(ws);
     chat.init(ws);
     utilities.setWebSocket(ws);
+    onboarding.init(ws);
 
     preTask.showPreTaskScreen();
   };
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log("Received message:", data);
   };
 
   ws.onerror = (error) => {
@@ -48,8 +48,7 @@ function generateAndStoreClientID() {
     return storedId;
   }
 
-  const fallbackId =
-    "client-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+  const fallbackId = "client-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
   sessionStorage.setItem("PROLIFIC_PID", fallbackId);
   console.log("Generated fallback client ID:", fallbackId);
   return fallbackId;

@@ -2,11 +2,13 @@ const postTask = (function () {
   let appContainer;
   let postTaskScreen;
   let ws;
+  let countdownInterval;
+  let allSlidersUpdated = false;
 
   function init(webSocketInstance) {
     appContainer = document.getElementById("app-container");
     ws = webSocketInstance;
-  
+
     postTaskScreen = document.createElement("div");
     postTaskScreen.classList.add("screen");
     postTaskScreen.innerHTML = `
@@ -21,81 +23,113 @@ const postTask = (function () {
       <div class="feature-sliders">
         <div class="slider-group">
           <label>Career Wins (Total number of fights the fighter has won)</label>
-          <input type="range" id="post-slider-wins" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-wins" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Career Losses (Total number of fights the fighter has lost)</label>
-          <input type="range" id="post-slider-losses" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-losses" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
-          <label>Age (The fighter’s current age in years)</label>
-          <input type="range" id="post-slider-age" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <label>Age (The fighter's current age in years)</label>
+          <input type="range" id="post-slider-age" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
-          <label>Height (The fighter’s height, which can affect reach and leverage)</label>
-          <input type="range" id="post-slider-height" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <label>Height (The fighter's height, which can affect reach and leverage)</label>
+          <input type="range" id="post-slider-height" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Strikes Landed/Minute (Average number of strikes the fighter lands per minute)</label>
-          <input type="range" id="post-slider-slpm" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-slpm" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Strike Accuracy (Percentage of strikes that land successfully)</label>
-          <input type="range" id="post-slider-accuracy" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-accuracy" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Strike Defense (Percentage of opponent strikes the fighter avoids)</label>
-          <input type="range" id="post-slider-defense" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-defense" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Takedown Defense (Percentage of opponent takedown attempts successfully defended)</label>
-          <input type="range" id="post-slider-td-defense" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-td-defense" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Strikes Avoided/Minute (Average number of strikes the fighter avoids per minute)</label>
-          <input type="range" id="post-slider-sapm" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-sapm" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
   
         <div class="slider-group">
           <label>Takedown Accuracy (Percentage of takedown attempts that are successful)</label>
-          <input type="range" id="post-slider-td-accuracy" min="1" max="100" value="50" />
-          <span class="slider-value">50</span>
+          <input type="range" id="post-slider-td-accuracy" min="1" max="100" value="0" />
+          <span class="slider-value">0</span>
         </div>
       </div>
+
+      <div id="posttask-validation-error" style="display: none; color: #ff4444; text-align: center; margin: 20px 0; font-weight: bold; animation: shake 0.5s ease-in-out infinite;">
+        ⚠️ Please review and adjust all sliders above before completing!
+      </div>
   
-      <button id="btn-finish">Finish</button>
+      <button id="btn-finish" disabled style="opacity: 0.5;">Finish</button>
       <div id="posttask-countdown" style="margin-top: 10px;"></div>
       <div id="thank-you-message" style="display: none; text-align: center; margin-top: 20px;">
         <h2>Thank you for your participation!</h2>
         <button id="btn-home">Go to Home</button>
       </div>
     `;
-  
+
     appContainer.appendChild(postTaskScreen);
-  
+
+    const sliderStates = new Map();
+
     postTaskScreen.querySelectorAll('input[type="range"]').forEach((slider) => {
       const valueDisplay = slider.nextElementSibling;
+      sliderStates.set(slider.id, false);
+
       slider.addEventListener("input", () => {
         valueDisplay.textContent = slider.value;
+        sliderStates.set(slider.id, true);
+        validateSliders();
       });
     });
+
+    function validateSliders() {
+      const allMoved = Array.from(sliderStates.values()).every(
+        (moved) => moved
+      );
+      const finishButton = postTaskScreen.querySelector("#btn-finish");
+      const errorMessage = postTaskScreen.querySelector(
+        "#posttask-validation-error"
+      );
+
+      allSlidersUpdated = allMoved;
+
+      if (allMoved) {
+        finishButton.disabled = false;
+        finishButton.style.opacity = "1";
+        errorMessage.style.display = "none";
+      } else {
+        finishButton.disabled = true;
+        finishButton.style.opacity = "0.5";
+        errorMessage.style.display = "block";
+      }
+    }
 
     postTaskScreen
       .querySelector("#btn-finish")
@@ -111,25 +145,57 @@ const postTask = (function () {
     ).textContent = `Total Winnings: $${finalWallet}`;
 
     const countdownEl = document.getElementById("posttask-countdown");
-    let remainTime = 60; // countdown duration in seconds
+    let remainTime = 30;
     countdownEl.textContent = `Session ending in ${remainTime} seconds`;
 
-    const countdownInterval = setInterval(() => {
+    countdownInterval = setInterval(() => {
       remainTime--;
       countdownEl.textContent = `Session ending in ${remainTime} seconds`;
+
       if (remainTime <= 0) {
         clearInterval(countdownInterval);
-        finishPostTask();
+
+        if (allSlidersUpdated) {
+          finishPostTask();
+        } else {
+          const errorMessage = postTaskScreen.querySelector(
+            "#posttask-validation-error"
+          );
+          const finishButton = postTaskScreen.querySelector("#btn-finish");
+
+          countdownEl.textContent =
+            "⏰ Time's up! Please complete all sliders to finish.";
+          countdownEl.style.color = "#ff4444";
+
+          errorMessage.style.display = "block";
+          errorMessage.innerHTML =
+            "⚠️ Please review and adjust all sliders above before completing!";
+
+          errorMessage.style.animation = "shake 0.3s ease-in-out infinite";
+
+          finishButton.style.animation = "pulse 1s ease-in-out infinite";
+        }
       }
     }, 1000);
   }
 
   function onFinish() {
-    // Disable the finish button immediately
+    if (!allSlidersUpdated) {
+      const errorMessage = postTaskScreen.querySelector(
+        "#posttask-validation-error"
+      );
+      errorMessage.style.display = "block";
+      errorMessage.style.animation = "shake 0.3s ease-in-out infinite";
+      return;
+    }
+
     const finishBtn = postTaskScreen.querySelector("#btn-finish");
     finishBtn.disabled = true;
 
-    // If not already present, create and append a waiting message
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+    }
+
     let waitingMsg = postTaskScreen.querySelector(".waiting-message");
     if (!waitingMsg) {
       waitingMsg = document.createElement("p");
@@ -137,6 +203,7 @@ const postTask = (function () {
       waitingMsg.innerHTML = "<strong>Waiting for session to end...</strong>";
       postTaskScreen.appendChild(waitingMsg);
     }
+    finishPostTask();
   }
 
   function hideAllScreens() {
