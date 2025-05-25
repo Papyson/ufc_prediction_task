@@ -5,6 +5,7 @@ const onboarding = (() => {
     let currentMode = null;
     let onboardingInProgress = false;
     let onboardingCountdownInterval = null;
+    let keepAliveInterval = null;
   
     const ONBOARDING_CONFIG = {
       itemDuration: 20, // 20 seconds per intro item
@@ -42,6 +43,32 @@ const onboarding = (() => {
       createOnboardingScreen();
     }
   
+    function startKeepAlive() {
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+      }
+  
+      keepAliveInterval = setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN && onboardingInProgress) {
+          ws.send(
+            JSON.stringify({
+              type: "ping",
+              clientID: sessionStorage.getItem("PROLIFIC_PID"),
+              timestamp: Date.now(),
+            })
+          );
+          console.log("Sent WebSocket keepalive ping during onboarding");
+        }
+      }, 15000);
+    }
+  
+    function stopKeepAlive() {
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+        keepAliveInterval = null;
+      }
+    }
+  
     function createOnboardingScreen() {
       onboardingScreen = document.createElement("div");
       onboardingScreen.classList.add("screen");
@@ -71,6 +98,8 @@ const onboarding = (() => {
       onboardingInProgress = true;
       hideAllScreens();
       onboardingScreen.style.display = "block";
+  
+      startKeepAlive();
   
       if (mode === "solo") {
         document.getElementById("onboarding-title").textContent =
@@ -770,7 +799,7 @@ const onboarding = (() => {
       if (onboardingCountdownInterval) {
         clearInterval(onboardingCountdownInterval);
       }
-  
+      stopKeepAlive();
       showTransitionScreen();
     }
   
@@ -779,20 +808,20 @@ const onboarding = (() => {
         "Onboarding Complete";
       document.getElementById("onboarding-content").innerHTML = `
       <div style="text-align: center; padding: 40px;">
-          <h3 style="color: #00ff00; margin-bottom: 20px;">✓ Onboarding Completed Successfully!</h3>
-          <p style="font-size: 1.1em; margin-bottom: 30px;">
+        <h3 style="color: #00ff00; margin-bottom: 20px;">✓ Onboarding Completed Successfully!</h3>
+        <p style="font-size: 1.1em; margin-bottom: 30px;">
           Great! You're now ready to start the ${
-              currentMode === "solo" ? "Solo" : "Group"
+            currentMode === "solo" ? "Solo" : "Group"
           } trials.
-          </p>
-          <div id="transition-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
+        </p>
+        <div id="transition-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
           Starting trials in <span id="countdown-timer">5</span> seconds...
-          </div>
-          <div style="margin-top: 20px; color: #aaa;">
+        </div>
+        <div style="margin-top: 20px; color: #aaa;">
           <p>The first trial will begin automatically.</p>
-          </div>
+        </div>
       </div>
-      `;
+    `;
   
       document.getElementById("onboarding-countdown-display").style.display =
         "none";
@@ -810,16 +839,6 @@ const onboarding = (() => {
           clearInterval(countdownInterval);
           onboardingInProgress = false;
           onboardingScreen.style.display = "none";
-  
-          setTimeout(() => {
-            const currentScreen = document.querySelector(
-              '.screen[style*="block"]'
-            );
-            if (!currentScreen || currentScreen.id === "onboarding-screen") {
-              console.log("Force showing trial screen after onboarding");
-              window.location.reload();
-            }
-          }, 1000);
         }
       }, 1000);
   

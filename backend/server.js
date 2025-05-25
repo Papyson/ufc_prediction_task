@@ -24,7 +24,12 @@ app.get("/downloads", (req, res) => {
 const server = http.createServer(app);
 
 // const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ 
+  server,
+  perMessageDeflate: false,
+  clientTracking: true,
+  maxPayload: 1024 * 1024
+});
 
 let clients = new Map();
 let clientUserNames = new Map();
@@ -54,6 +59,20 @@ const PHASES = {
 
 // Session state map to track trial phases for each session
 const sessionStates = new Map();
+
+function pingClients() {
+  clients.forEach((ws, clientID) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.ping();
+    } else {
+      console.log(`Removing dead client: ${clientID}`);
+      clients.delete(clientID);
+      clientUserNames.delete(clientID);
+    }
+  });
+}
+
+setInterval(pingClients, 30000);
 
 function broadcastParticipantCount() {
   const count = clients.size;
@@ -598,6 +617,12 @@ function checkAndBroadcastWagers(sessionID) {
 sessionManager.setUpdateCallback(broadcastSessionUpdate);
 
 wss.on("connection", (ws) => {
+  ws.isAlive = true;
+  
+  ws.on("pong", () => {
+    ws.isAlive = true;
+  });
+
   ws.on("message", async (message) => {
     let data;
     try {
@@ -611,6 +636,15 @@ wss.on("connection", (ws) => {
     }
 
     const clientID = data.clientID;
+
+    if (data.type === "ping" && clientID) {
+      ws.send(JSON.stringify({
+        type: "pong",
+        timestamp: Date.now()
+      }));
+      console.log(`Received ping from ${clientID}, sent pong`);
+      return;
+    }
 
     if (data.type === "register" && clientID) {
       clients.set(clientID, ws);
