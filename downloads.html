@@ -38,27 +38,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Experiment Data Download</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <section style="margin: 2em auto; max-width: 600px; text-align: center;">
     <h1>Experiment Data Download</h1>
-    <p>This page is for researchers to download the aggregated experiment data.</p>
+    <p>This page is for researchers to download the aggregated experiment data (including fight data).</p>
 
     <div style="margin-top: 2em; display: grid; grid-template-columns: 1fr 1fr; gap: 2em;">
-      <!-- Solo Downloads -->
+      <!-- Solo Download -->
       <div style="border: 1px solid #ccc; padding: 1em; border-radius: 8px;">
         <h2>Solo Sessions</h2>
-        <button id="soloBase" style="margin-right: 0.5em;">Download Baseline CSV</button>
-        <button id="soloEnriched">Download + Fight Data</button>
+        <button id="soloDownload">Download Solo CSV</button>
       </div>
-      <!-- Group Downloads -->
+      <!-- Group Download -->
       <div style="border: 1px solid #ccc; padding: 1em; border-radius: 8px;">
         <h2>Group Sessions</h2>
-        <button id="groupBase" style="margin-right: 0.5em;">Download Baseline CSV</button>
-        <button id="groupEnriched">Download + Fight Data</button>
+        <button id="groupDownload">Download Group CSV</button>
       </div>
     </div>
   </section>
@@ -70,19 +68,14 @@
       ? 'http://localhost:8080'
       : 'https://api.mental-model-task.xyz';
 
-    // Wire buttons to the new endpoint
-    document.getElementById('soloBase').onclick = () => {
-      window.location.href = `${apiBase}/exportCsv?mode=solo`;
-    };
-    document.getElementById('soloEnriched').onclick = () => {
+    // Wire buttons to always include fight data
+    document.getElementById('soloDownload').onclick = () => {
       window.location.href = `${apiBase}/exportCsv?mode=solo&includeFightData=true`;
     };
-    document.getElementById('groupBase').onclick = () => {
-      window.location.href = `${apiBase}/exportCsv?mode=group`;
-    };
-    document.getElementById('groupEnriched').onclick = () => {
+    document.getElementById('groupDownload').onclick = () => {
       window.location.href = `${apiBase}/exportCsv?mode=group&includeFightData=true`;
     };
   </script>
 </body>
 </html>
+
