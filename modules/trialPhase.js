@@ -1151,22 +1151,22 @@ function showTrialScreenSolo() {
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.strikelaM ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 5 ? 'rationale-row' : ''}">
-              <td>Strike Accuracy</td>
+              <td>Strike Accuracy(%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.sigSacc ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.sigSacc ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 6 ? 'rationale-row' : ''}">
-              <td>Strike Defense</td>
+              <td>Strike Defense(%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.strDef ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.strDef ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 7 ? 'rationale-row' : ''}">
-              <td>Takedown Accuracy</td>
+              <td>Takedown Accuracy(%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.tdAcc ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.tdAcc ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 8 ? 'rationale-row' : ''}">
-              <td>Takedown Defense</td>
+              <td>Takedown Defense(%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.tdDef ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.tdDef ?? "N/A"}</td>
             </tr>
@@ -1195,7 +1195,7 @@ function showTrialScreenSolo() {
     try {
       const formatPercent = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? (num * 100).toFixed(0) + "%" : "N/A";
+        return !isNaN(num) ? (num * 100).toFixed(0) : "N/A";
       };
       const formatAge = (value) => {
         const num = parseInt(value, 10);
@@ -1203,7 +1203,7 @@ function showTrialScreenSolo() {
       };
       const formatPerMin = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? num.toFixed(2) + "/min" : "N/A";
+        return !isNaN(num) ? num.toFixed(2) : "N/A";
       };
 
       currentFightData = {

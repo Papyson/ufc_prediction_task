@@ -90,7 +90,7 @@ const postTask = (function () {
       <div id="posttask-countdown" style="margin-top: 10px;"></div>
       <div id="thank-you-message" style="display: none; text-align: center; margin-top: 20px;">
         <h2>Thank you for your participation!</h2>
-        <button id="btn-home">Go to Home</button>
+        <button id="btn-home">Go to Prolific</button>
       </div>
     `;
 
@@ -277,6 +277,7 @@ const postTask = (function () {
     thankYouDiv.style.display = "block";
     thankYouDiv.querySelector("#btn-home").addEventListener("click", () => {
       window.location.reload();
+      //window.location.href = "https://app.prolific.com/submissions/complete?cc=C17HKXVH";
     });
   }
 
