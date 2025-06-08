@@ -334,6 +334,7 @@ const preTask = (function () {
           </ul>
           
           <p class="consent-text">If you do <strong>not consent</strong>, you may click below to return to Prolific without participating.</p><br/>
+          <p class="consent-text">⚠️ You must not click the <strong>"I have read and understood the information above"</strong> checkbox. Click only the <strong>I Consent and Continue</strong> button</p><br/>
           
           <h3>Contact Information</h3>
           <p class="consent-text">If you have any questions about this study or your rights as a participant, you may contact the research team at:</p>
@@ -361,7 +362,7 @@ const preTask = (function () {
     let hasScrolledToBottom = false;
 
     function checkEnableButton() {
-      acceptButton.disabled = !(hasScrolledToBottom && checkbox.checked);
+      acceptButton.disabled = !hasScrolledToBottom;
     }
 
     contentElement.addEventListener("scroll", function () {
@@ -374,13 +375,15 @@ const preTask = (function () {
       }
     });
 
-    checkbox.addEventListener("change", checkEnableButton);
-
     document
       .getElementById("accept-consent")
       .addEventListener("click", function () {
-        modal.style.display = "none";
-        preTaskScreen.style.display = "block";
+        if (checkbox.checked) {
+          showWarningModal();
+        } else {
+          modal.style.display = "none";
+          preTaskScreen.style.display = "block";
+        }
       });
 
     document
@@ -389,6 +392,41 @@ const preTask = (function () {
         const prolificURL = window.CONFIG?.prolificRedirectURL;
         window.location.href = prolificURL;
       });
+
+    function showWarningModal() {
+      const warningModal = document.createElement("div");
+      warningModal.className = "modal-overlay";
+      warningModal.id = "warning-modal";
+      warningModal.style.zIndex = "10001";
+
+      warningModal.innerHTML = `
+    <div class="modal-container" style="max-width: 500px; margin: 20% auto;">
+      <div class="modal-header" style="background-color: #ff4444; color: white;">
+        <h2>⚠️ Warning</h2>
+      </div>
+      <div class="modal-content" style="text-align: center; padding: 30px; color: black;">
+        <p style="font-size: 1.1em; margin-bottom: 20px; color: black;">
+          <strong>Please read the consent details properly!</strong>
+        </p>
+        <p style="margin-bottom: 20px; color: black;">
+          Please read the instructions carefully and only click the "I Consent and Continue" button after reading the full consent form.
+        </p>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button id="close-warning" class="modal-btn btn-primary">Close</button>
+      </div>
+    </div>
+  `;
+
+      document.body.appendChild(warningModal);
+
+      document
+        .getElementById("close-warning")
+        .addEventListener("click", function () {
+          document.body.removeChild(warningModal);
+          checkbox.checked = false;
+        });
+    }
   }
   return {
     init,
