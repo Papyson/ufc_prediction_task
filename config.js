@@ -6,7 +6,7 @@ const CONFIG = {
   // Endpoint for your server-side data saving if needed (this example uses a placeholder)
   serverEndpoint: "https://yourserver.com/api/saveData",
   // Prolific redirection URL (standard Prolific completion endpoint)
-  prolificRedirectURL: "https://app.prolific.co/submissions/complete",
+  prolificRedirectURL: "https://app.prolific.com",
   // Additional configuration for WebSocket if you implement real-time features
   wsUrl: function() {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {

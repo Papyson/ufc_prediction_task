@@ -1126,17 +1126,17 @@ function showTrialScreenSolo() {
           </thead>
           <tbody>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 0 ? 'rationale-row' : ''}">
-              <td>Career Wins</td>
+              <td>Wins</td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.wins ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.wins ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 1 ? 'rationale-row' : ''}">
-              <td>Career Losses</td>
+              <td>Losses</td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.losses ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.losses ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 2 ? 'rationale-row' : ''}">
-              <td>Age</td>
+              <td>Age (Yrs) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.age ? fa.age + " yrs" : "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.age ? fb.age + " yrs" : "N/A"}</td>
             </tr>
@@ -1151,22 +1151,22 @@ function showTrialScreenSolo() {
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.strikelaM ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 5 ? 'rationale-row' : ''}">
-              <td>Strike Accuracy(%) </td>
+              <td>Strike Accuracy (%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.sigSacc ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.sigSacc ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 6 ? 'rationale-row' : ''}">
-              <td>Strike Defense(%) </td>
+              <td>Strike Defense (%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.strDef ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.strDef ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 7 ? 'rationale-row' : ''}">
-              <td>Takedown Accuracy(%) </td>
+              <td>Takedown Accuracy (%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.tdAcc ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.tdAcc ?? "N/A"}</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 8 ? 'rationale-row' : ''}">
-              <td>Takedown Defense(%) </td>
+              <td>Takedown Defense (%) </td>
               <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.tdDef ?? "N/A"}</td>
               <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.tdDef ?? "N/A"}</td>
             </tr>
@@ -1210,7 +1210,7 @@ function showTrialScreenSolo() {
         fighterA: {
           wins: parseInt(trialDataRow.r_wins_total) || 0,
           losses: parseInt(trialDataRow.r_losses_total) || 0,
-          age: formatAge(trialDataRow.r_age),
+          age: parseInt(trialDataRow.r_age) || 0,
           height: trialDataRow.r_height || "N/A",
           strikelaM: formatPerMin(trialDataRow.r_SLpM_total),
           sigSacc: formatPercent(trialDataRow.r_sig_str_acc_total),
@@ -1222,7 +1222,7 @@ function showTrialScreenSolo() {
         fighterB: {
           wins: parseInt(trialDataRow.b_wins_total) || 0,
           losses: parseInt(trialDataRow.b_losses_total) || 0,
-          age: formatAge(trialDataRow.b_age),
+          age: parseInt(trialDataRow.b_age) || 0,
           height: trialDataRow.b_height || "N/A",
           strikelaM: formatPerMin(trialDataRow.b_SLpM_total),
           sigSacc: formatPercent(trialDataRow.b_sig_str_acc_total),
