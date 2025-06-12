@@ -12,7 +12,7 @@ body {
 }
 
 #app-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 40px auto;
   padding: 20px;
   background: rgba(0, 0, 0, 0.7);
@@ -858,5 +858,60 @@ button.validation-passed {
   }
   .wager-column:last-child {
     border-bottom: none;
+  }
+}
+
+.main-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.left-section {
+  flex: 2;
+  min-width: 0;
+}
+
+.right-section {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid #ffcc00;
+}
+
+.initial-bet-position {
+  margin-top: 35;
+  align-self: flex-start;
+}
+
+.final-bet-position {
+  margin-top: 95px;
+  align-self: flex-start;
+}
+
+.right-section button {
+  width: 100%;
+  margin-top: 25px;
+}
+
+.confirmed-wagers-display {
+  margin-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.chat-container {
+  height: 150px;
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .right-section {
+    min-width: auto;
+    width: 100%;
   }
 }

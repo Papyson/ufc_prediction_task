@@ -65,8 +65,7 @@ const trialPhase = (function () {
         if (data.sessionID) sessionID = data.sessionID;
         if (data.mode) isSolo = data.mode === "solo";
         console.log(
-          `Session update: ID=${sessionID}, Mode=${
-            isSolo ? "Solo" : "Group"
+          `Session update: ID=${sessionID}, Mode=${isSolo ? "Solo" : "Group"
           }, Status=${data.status}`
         );
       } else if (data.type === "phaseChange") {
@@ -113,9 +112,9 @@ const trialPhase = (function () {
 
         const forceShowScreen = () => {
           hideAllScreens();
-          
+
           console.log(`Showing screen for phase: ${currentPhase}, subPhase: ${currentSubPhase}`);
-          
+
           switch (currentPhase) {
             case "initial":
               showTrialScreenSolo();
@@ -131,7 +130,7 @@ const trialPhase = (function () {
               break;
           }
           setupDynamicCountdown();
-          
+
           setTimeout(() => {
             const visibleScreen = document.querySelector('.screen[style*="block"]');
             if (!visibleScreen) {
@@ -223,9 +222,9 @@ const trialPhase = (function () {
   function updateWaitingMessage(received, total) {
     const wagersContainer = groupDelibScreen?.querySelector("#wagers-container");
     if (!wagersContainer) return;
-    
+
     let waitingMsg = wagersContainer.querySelector(".waiting-message");
-    
+
     if (waitingMsg && waitingMsg.classList.contains("persistent-waiting")) {
       waitingMsg.innerHTML = `Your bet of ${initialWager} has been confirmed.`;
     }
@@ -240,12 +239,12 @@ const trialPhase = (function () {
     resultConfirmed = currentPhase !== "result";
     chatInputEnabled =
       currentPhase === "groupDelib" && currentSubPhase === "chat";
-      autoConfirmTriggered = false;
+    autoConfirmTriggered = false;
 
     if (currentPhase === "groupDelib" && currentSubPhase === "chat") {
       groupChatMessages = [];
     }
-    
+
     if (currentPhase === "groupDelib" && currentSubPhase === "wager") {
       collectedWagers = {};
       collectedUserNames = {};
@@ -324,8 +323,8 @@ const trialPhase = (function () {
       if (currentSubPhase === "wager") {
         wagerSection.style.display = "block";
         chatSection.style.display = "none";
-        const hasContent = confirmedWagersDisplay.querySelector(".wager-column") || 
-                          confirmedWagersDisplay.querySelector(".waiting-message");
+        const hasContent = confirmedWagersDisplay.querySelector(".wager-column") ||
+          confirmedWagersDisplay.querySelector(".waiting-message");
         if (hasContent || isGroupWagerConfirmed) {
           confirmedWagersDisplay.style.display = "flex";
         } else {
@@ -367,9 +366,9 @@ const trialPhase = (function () {
           const myUserName = sessionStorage.getItem("userName");
           const wagerSlider = groupDelibScreen.querySelector("#group-wager-range");
           initialWager = parseInt(wagerSlider.value, 10);
-          
+
           collectedWagers[myClientID] = initialWager;
-          
+
           ws.send(
             JSON.stringify({
               type: "updateWager",
@@ -485,12 +484,12 @@ const trialPhase = (function () {
       </div>`;
     appContainer.appendChild(groupDelibScreen);
 
-   groupDelibScreen
-    .querySelector("#group-wager-range")
-    .addEventListener("input", (e) => {
-      initialWager = parseInt(e.target.value, 10);
-      document.getElementById("group-wager-value").textContent = initialWager;
-    });
+    groupDelibScreen
+      .querySelector("#group-wager-range")
+      .addEventListener("input", (e) => {
+        initialWager = parseInt(e.target.value, 10);
+        document.getElementById("group-wager-value").textContent = initialWager;
+      });
     groupDelibScreen
       .querySelector("#btn-confirm-group-wager")
       .addEventListener("click", onConfirmGroupWager);
@@ -526,7 +525,7 @@ const trialPhase = (function () {
     clientIDs.forEach((clientID) => {
       const wagerValue = wagers[clientID];
       const isCurrentUser = clientID === currentUserClientID;
-      let displayName = collectedUserNames[clientID] || clientID; 
+      let displayName = collectedUserNames[clientID] || clientID;
 
       const column = document.createElement("div");
       column.classList.add("wager-column");
@@ -597,7 +596,7 @@ const trialPhase = (function () {
 
     const myClientID = sessionStorage.getItem("PROLIFIC_PID");
     const myUserName = sessionStorage.getItem("userName") || "You";
-    
+
     collectedWagers[myClientID] = initialWager;
     collectedUserNames[myClientID] = myUserName;
 
@@ -626,11 +625,11 @@ const trialPhase = (function () {
     confirmationMsg.innerHTML = `Your bet of ${initialWager} has been confirmed.`;
     confirmationMsg.style.color = "#00ff00";
     confirmationMsg.style.marginTop = "15px";
-    
+
     const wagersContainer = groupDelibScreen.querySelector("#wagers-container");
     wagersContainer.innerHTML = "";
     wagersContainer.appendChild(confirmationMsg);
-    
+
     const wagersDisplay = groupDelibScreen.querySelector("#confirmed-wagers-display");
     wagersDisplay.style.display = "flex";
   }
@@ -726,35 +725,33 @@ const trialPhase = (function () {
     );
   }
 
-function showTrialScreenSolo() {
-  hideAllScreens();
-  if (!initialScreen || !currentFightData) {
-    console.error("Cannot show solo screen - missing screen or data");
-    return;
-  }
+  function showTrialScreenSolo() {
+    hideAllScreens();
+    if (!initialScreen || !currentFightData) {
+      console.error("Cannot show solo screen - missing screen or data");
+      return;
+    }
 
-  console.log("Showing solo trial screen for trial", currentTrial);
+    console.log("Showing solo trial screen for trial", currentTrial);
 
-  initialScreen.querySelector("#solo-trial-number").textContent = currentTrial;
-  const confirmButton = initialScreen.querySelector("#btn-confirm-initial");
-  confirmButton.disabled = false;
-  confirmButton.textContent = "Confirm Initial Bet";
+    initialScreen.querySelector("#solo-trial-number").textContent = currentTrial;
+    const confirmButton = initialScreen.querySelector("#btn-confirm-initial");
+    confirmButton.disabled = false;
+    confirmButton.textContent = "Confirm Initial Bet";
 
-  initialWager = 2;
+    initialWager = 2;
 
-  const contentEl = initialScreen.querySelector("#initial-content");
-  const wallet = utilities.getWallet();
-  contentEl.innerHTML = `
+    const contentEl = initialScreen.querySelector("#initial-content");
+    const wallet = utilities.getWallet();
+    contentEl.innerHTML = `
     <p><strong>💰 Wallet:</strong> $${wallet}</p>
     ${generateFighterTableHTML()}
     <div class="ai-highlight">
       <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-      ${
-        window.aiMode !== "neutralAI"
-          ? `<p><strong>Explanation:</strong> ${
-              currentFightData.justification || "N/A"
-            }</p>`
-          : ""
+      ${window.aiMode !== "neutralAI"
+        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
+        }</p>`
+        : ""
       }
     </div>
     <div class="wager-slider-container" style="margin-top: 20px;">
@@ -763,27 +760,27 @@ function showTrialScreenSolo() {
     </div>
   `;
 
-  const wagerSlider = contentEl.querySelector("#initial-wager-range");
-  wagerSlider.disabled = false;
-  wagerSlider.value = initialWager;
-  wagerSlider.addEventListener("input", (e) => {
-    if (!soloInitialConfirmed){
-      initialWager = parseInt(e.target.value, 10);
-      document.getElementById("initial-wager-value").textContent = initialWager;
-    }
-  });
+    const wagerSlider = contentEl.querySelector("#initial-wager-range");
+    wagerSlider.disabled = false;
+    wagerSlider.value = initialWager;
+    wagerSlider.addEventListener("input", (e) => {
+      if (!soloInitialConfirmed) {
+        initialWager = parseInt(e.target.value, 10);
+        document.getElementById("initial-wager-value").textContent = initialWager;
+      }
+    });
 
-  initialScreen.style.display = "block";
-  initialScreen.style.visibility = "visible";
-  
-  setTimeout(() => {
-    if (initialScreen.style.display !== "block") {
-      console.warn("Solo screen not visible, forcing display");
-      initialScreen.style.display = "block";
-      initialScreen.style.visibility = "visible";
-    }
-  }, 100);
-}
+    initialScreen.style.display = "block";
+    initialScreen.style.visibility = "visible";
+
+    setTimeout(() => {
+      if (initialScreen.style.display !== "block") {
+        console.warn("Solo screen not visible, forcing display");
+        initialScreen.style.display = "block";
+        initialScreen.style.visibility = "visible";
+      }
+    }, 100);
+  }
 
   function showGroupDelibScreen(rejoinWagers = null) {
     hideAllScreens();
@@ -810,11 +807,10 @@ function showTrialScreenSolo() {
       ${generateFighterTableHTML()}
       <div class="ai-highlight">
         <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-        ${
-          window.aiMode !== "neutralAI"
-            ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"}</p>`
-            : ""
-        }
+        ${window.aiMode !== "neutralAI"
+        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"}</p>`
+        : ""
+      }
       </div>
     `;
 
@@ -886,7 +882,7 @@ function showTrialScreenSolo() {
 
     groupDelibScreen.style.display = "block";
     groupDelibScreen.style.visibility = "visible";
-    
+
     setTimeout(() => {
       if (groupDelibScreen.style.display !== "block") {
         console.warn("Group screen not visible, forcing display");
@@ -919,13 +915,11 @@ function showTrialScreenSolo() {
       ${generateFighterTableHTML()}
       <div class="ai-highlight">
         <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-        ${
-          window.aiMode !== "neutralAI"
-            ? `<p><strong>Explanation:</strong> ${
-                currentFightData.justification || "N/A"
-              }</p>`
-            : ""
-        }
+        ${window.aiMode !== "neutralAI"
+        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
+        }</p>`
+        : ""
+      }
       </div>
       <div class="wager-slider-container" style="margin-top: 20px;">
         <label for="final-wager-range">Final Bet (0-4): <span id="final-wager-value">${finalWager}</span></label>
@@ -949,7 +943,7 @@ function showTrialScreenSolo() {
 
     finalDecisionScreen.style.display = "block";
     finalDecisionScreen.style.visibility = "visible";
-    
+
     setTimeout(() => {
       if (finalDecisionScreen.style.display !== "block") {
         console.warn("Final decision screen not visible, forcing display");
@@ -1005,10 +999,9 @@ function showTrialScreenSolo() {
 
     resultContent.innerHTML = `
       <p><strong>Fight Outcome:</strong> ${winnerText}</p>
-      <p><strong>AI Prediction was:</strong> ${
-        serverAiCorrect
-          ? '<span style="color: lightgreen;">Correct</span>'
-          : '<span style="color: salmon;">Incorrect</span>'
+      <p><strong>AI Prediction was:</strong> ${serverAiCorrect
+        ? '<span style="color: lightgreen;">Correct</span>'
+        : '<span style="color: salmon;">Incorrect</span>'
       }</p>
       <p>${outcomeText}</p>
       <hr style="margin: 10px 0; border-color: #555;">
@@ -1018,7 +1011,7 @@ function showTrialScreenSolo() {
 
     resultScreen.style.display = "block";
     resultScreen.style.visibility = "visible";
-    
+
     setTimeout(() => {
       if (resultScreen.style.display !== "block") {
         console.warn("Result screen not visible, forcing display");
@@ -1079,7 +1072,7 @@ function showTrialScreenSolo() {
         screen.style.visibility = "hidden";
       }
     });
-    
+
     setTimeout(() => {
       screens.forEach((screen) => {
         if (screen && screen.id !== "onboarding-screen") {
@@ -1094,7 +1087,7 @@ function showTrialScreenSolo() {
     const fa = currentFightData.fighterA || {};
     const fb = currentFightData.fighterB || {};
 
-    const fighterAWins = currentFightData.predicted_winner_numeric === 1;  
+    const fighterAWins = currentFightData.predicted_winner_numeric === 1;
     const fighterBWins = currentFightData.predicted_winner_numeric === 0;
 
     const featureToRowMap = {
@@ -1111,7 +1104,7 @@ function showTrialScreenSolo() {
     };
 
     const rationaleFeature = currentFightData.aiRationale || "";
-    
+
     const rowToHighlight = featureToRowMap[rationaleFeature];
 
     return `
@@ -1233,15 +1226,14 @@ function showTrialScreenSolo() {
         },
         predicted_winner_numeric:
           trialDataRow.predicted_winner === "0" ||
-          trialDataRow.predicted_winner === 0
+            trialDataRow.predicted_winner === 0
             ? 0
             : 1,
-        aiPrediction: `Fighter ${
-          trialDataRow.predicted_winner === "0" ||
-          trialDataRow.predicted_winner === 0
+        aiPrediction: `Fighter ${trialDataRow.predicted_winner === "0" ||
+            trialDataRow.predicted_winner === 0
             ? "B"
             : "A"
-        } to win`,
+          } to win`,
         aiRationale: trialDataRow.rationale_feature || "N/A",
         winner:
           trialDataRow.winner !== undefined

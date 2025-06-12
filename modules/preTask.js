@@ -299,6 +299,8 @@ const preTask = (function () {
         <div class="modal-content" id="consent-content">
           <p class="consent-text">Thank you for participating!</p><br/>
 
+          <p class="consent-text"> Be sure to read all the instruction before proceeding, failure to do so might result in your disqualification to partake in the experiment.</p><br/>
+
           <p class="consent-text">In this study, you will engage in a 
           <strong>decision-making task</strong> involving predictions about the outcomes of real UFC fights. 
           You'll be shown fighter statistics (such as age, height, win/loss record, and performance metrics), 
