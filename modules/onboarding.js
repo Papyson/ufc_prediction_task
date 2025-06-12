@@ -237,54 +237,54 @@ const onboarding = (() => {
                 </thead>
                 <tbody>
                   <tr class="rationale-row">
-                    <td>Career Wins</td>
+                    <td>Wins</td>
                     <td class="winner-column-cell">15</td>
                     <td>12</td>
                   </tr>
                   <tr>
-                    <td>Career Losses</td>
+                    <td>Losses</td>
                     <td class="winner-column-cell">3</td>
                     <td>4</td>
                   </tr>
                   <tr>
-                    <td>Age</td>
-                    <td class="winner-column-cell">28 yrs</td>
-                    <td>31 yrs</td>
+                    <td>Age (yrs)</td>
+                    <td class="winner-column-cell">28</td>
+                    <td>31</td>
                   </tr>
                   <tr>
                     <td>Height</td>
-                    <td class="winner-column-cell">6'2"</td>
-                    <td>6'0"</td>
+                    <td class="winner-column-cell">190.5</td>
+                    <td>188.43</td>
                   </tr>
                   <tr>
                     <td>Strikes Landed/Min</td>
-                    <td class="winner-column-cell">4.2/min</td>
-                    <td>3.8/min</td>
+                    <td class="winner-column-cell">4.2</td>
+                    <td>3.8</td>
                   </tr>
                   <tr>
-                    <td>Strike Accuracy</td>
-                    <td class="winner-column-cell">65%</td>
-                    <td>58%</td>
+                    <td>Strike Accuracy (%)</td>
+                    <td class="winner-column-cell">65</td>
+                    <td>58</td>
                   </tr>
                   <tr>
-                    <td>Strike Defense</td>
-                    <td class="winner-column-cell">72%</td>
-                    <td>68%</td>
+                    <td>Strike Defense (%)</td>
+                    <td class="winner-column-cell">72</td>
+                    <td>68</td>
                   </tr>
                   <tr>
-                    <td>Takedown Accuracy</td>
-                    <td class="winner-column-cell">85%</td>
-                    <td>78%</td>
+                    <td>Takedown Accuracy (%)</td>
+                    <td class="winner-column-cell">85</td>
+                    <td>78</td>
                   </tr>
                   <tr>
-                    <td>Takedown Defense</td>
-                    <td class="winner-column-cell">88%</td>
-                    <td>82%</td>
+                    <td>Takedown Defense (%)</td>
+                    <td class="winner-column-cell">88</td>
+                    <td>82</td>
                   </tr>
                   <tr>
                     <td>Strikes Avoided/Min</td>
-                    <td class="winner-column-cell">2.1/min</td>
-                    <td>2.5/min</td>
+                    <td class="winner-column-cell">2.1</td>
+                    <td>2.5</td>
                   </tr>
                 </tbody>
               </table>
@@ -323,54 +323,54 @@ const onboarding = (() => {
                 </thead>
                 <tbody>
                   <tr class="rationale-row">
-                    <td>Career Wins</td>
+                    <td>Wins</td>
                     <td class="winner-column-cell">15</td>
                     <td>12</td>
                   </tr>
                   <tr>
-                    <td>Career Losses</td>
+                    <td>Losses</td>
                     <td class="winner-column-cell">3</td>
                     <td>4</td>
                   </tr>
                   <tr>
-                    <td>Age</td>
-                    <td class="winner-column-cell">28 yrs</td>
-                    <td>31 yrs</td>
+                    <td>Age (yrs)</td>
+                    <td class="winner-column-cell">28</td>
+                    <td>31</td>
                   </tr>
                   <tr>
                     <td>Height</td>
-                    <td class="winner-column-cell">6'2"</td>
-                    <td>6'0"</td>
+                    <td class="winner-column-cell">190.5</td>
+                    <td>188.43</td>
                   </tr>
                   <tr>
                     <td>Strikes Landed/Min</td>
-                    <td class="winner-column-cell">4.2/min</td>
-                    <td>3.8/min</td>
+                    <td class="winner-column-cell">4.2</td>
+                    <td>3.8</td>
                   </tr>
                   <tr>
-                    <td>Strike Accuracy</td>
-                    <td class="winner-column-cell">65%</td>
-                    <td>58%</td>
+                    <td>Strike Accuracy (%)</td>
+                    <td class="winner-column-cell">65</td>
+                    <td>58</td>
                   </tr>
                   <tr>
-                    <td>Strike Defense</td>
-                    <td class="winner-column-cell">72%</td>
-                    <td>68%</td>
+                    <td>Strike Defense (%)</td>
+                    <td class="winner-column-cell">72</td>
+                    <td>68</td>
                   </tr>
                   <tr>
-                    <td>Takedown Accuracy</td>
-                    <td class="winner-column-cell">85%</td>
-                    <td>78%</td>
+                    <td>Takedown Accuracy (%)</td>
+                    <td class="winner-column-cell">85</td>
+                    <td>78</td>
                   </tr>
                   <tr>
-                    <td>Takedown Defense</td>
-                    <td class="winner-column-cell">88%</td>
-                    <td>82%</td>
+                    <td>Takedown Defense (%)</td>
+                    <td class="winner-column-cell">88</td>
+                    <td>82</td>
                   </tr>
                   <tr>
                     <td>Strikes Avoided/Min</td>
-                    <td class="winner-column-cell">2.1/min</td>
-                    <td>2.5/min</td>
+                    <td class="winner-column-cell">2.1</td>
+                    <td>2.5</td>
                   </tr>
                 </tbody>
               </table>
@@ -409,54 +409,54 @@ const onboarding = (() => {
                 </thead>
                 <tbody>
                   <tr class="rationale-row">
-                    <td>Career Wins</td>
+                    <td>Wins</td>
                     <td class="winner-column-cell">15</td>
                     <td>12</td>
                   </tr>
                   <tr>
-                    <td>Career Losses</td>
+                    <td>Losses</td>
                     <td class="winner-column-cell">3</td>
                     <td>4</td>
                   </tr>
                   <tr>
-                    <td>Age</td>
-                    <td class="winner-column-cell">28 yrs</td>
-                    <td>31 yrs</td>
+                    <td>Age (yrs)</td>
+                    <td class="winner-column-cell">28</td>
+                    <td>31</td>
                   </tr>
                   <tr>
                     <td>Height</td>
-                    <td class="winner-column-cell">6'2"</td>
-                    <td>6'0"</td>
+                    <td class="winner-column-cell">190.5</td>
+                    <td>188.43</td>
                   </tr>
                   <tr>
                     <td>Strikes Landed/Min</td>
-                    <td class="winner-column-cell">4.2/min</td>
-                    <td>3.8/min</td>
+                    <td class="winner-column-cell">4.2</td>
+                    <td>3.8</td>
                   </tr>
                   <tr>
-                    <td>Strike Accuracy</td>
-                    <td class="winner-column-cell">65%</td>
-                    <td>58%</td>
+                    <td>Strike Accuracy (%)</td>
+                    <td class="winner-column-cell">65</td>
+                    <td>58</td>
                   </tr>
                   <tr>
-                    <td>Strike Defense</td>
-                    <td class="winner-column-cell">72%</td>
-                    <td>68%</td>
+                    <td>Strike Defense (%)</td>
+                    <td class="winner-column-cell">72</td>
+                    <td>68</td>
                   </tr>
                   <tr>
-                    <td>Takedown Accuracy</td>
-                    <td class="winner-column-cell">85%</td>
-                    <td>78%</td>
+                    <td>Takedown Accuracy (%)</td>
+                    <td class="winner-column-cell">85</td>
+                    <td>78</td>
                   </tr>
                   <tr>
-                    <td>Takedown Defense</td>
-                    <td class="winner-column-cell">88%</td>
-                    <td>82%</td>
+                    <td>Takedown Defense (%)</td>
+                    <td class="winner-column-cell">88</td>
+                    <td>82</td>
                   </tr>
                   <tr>
                     <td>Strikes Avoided/Min</td>
-                    <td class="winner-column-cell">2.1/min</td>
-                    <td>2.5/min</td>
+                    <td class="winner-column-cell">2.1</td>
+                    <td>2.5</td>
                   </tr>
                 </tbody>
               </table>
@@ -540,54 +540,54 @@ const onboarding = (() => {
                 </thead>
                 <tbody>
                   <tr class="rationale-row">
-                    <td>Career Wins</td>
+                    <td>Wins</td>
                     <td class="winner-column-cell">15</td>
                     <td>12</td>
                   </tr>
                   <tr>
-                    <td>Career Losses</td>
+                    <td>Losses</td>
                     <td class="winner-column-cell">3</td>
                     <td>4</td>
                   </tr>
                   <tr>
-                    <td>Age</td>
-                    <td class="winner-column-cell">28 yrs</td>
-                    <td>31 yrs</td>
+                    <td>Age (yrs)</td>
+                    <td class="winner-column-cell">28</td>
+                    <td>31</td>
                   </tr>
                   <tr>
                     <td>Height</td>
-                    <td class="winner-column-cell">6'2"</td>
-                    <td>6'0"</td>
+                    <td class="winner-column-cell">190.5</td>
+                    <td>188.43</td>
                   </tr>
                   <tr>
                     <td>Strikes Landed/Min</td>
-                    <td class="winner-column-cell">4.2/min</td>
-                    <td>3.8/min</td>
+                    <td class="winner-column-cell">4.2</td>
+                    <td>3.8</td>
                   </tr>
                   <tr>
-                    <td>Strike Accuracy</td>
-                    <td class="winner-column-cell">65%</td>
-                    <td>58%</td>
+                    <td>Strike Accuracy (%)</td>
+                    <td class="winner-column-cell">65</td>
+                    <td>58</td>
                   </tr>
                   <tr>
-                    <td>Strike Defense</td>
-                    <td class="winner-column-cell">72%</td>
-                    <td>68%</td>
+                    <td>Strike Defense (%)</td>
+                    <td class="winner-column-cell">72</td>
+                    <td>68</td>
                   </tr>
                   <tr>
-                    <td>Takedown Accuracy</td>
-                    <td class="winner-column-cell">85%</td>
-                    <td>78%</td>
+                    <td>Takedown Accuracy (%)</td>
+                    <td class="winner-column-cell">85</td>
+                    <td>78</td>
                   </tr>
                   <tr>
-                    <td>Takedown Defense</td>
-                    <td class="winner-column-cell">88%</td>
-                    <td>82%</td>
+                    <td>Takedown Defense (%)</td>
+                    <td class="winner-column-cell">88</td>
+                    <td>82</td>
                   </tr>
                   <tr>
                     <td>Strikes Avoided/Min</td>
-                    <td class="winner-column-cell">2.1/min</td>
-                    <td>2.5/min</td>
+                    <td class="winner-column-cell">2.1</td>
+                    <td>2.5</td>
                   </tr>
                 </tbody>
               </table>

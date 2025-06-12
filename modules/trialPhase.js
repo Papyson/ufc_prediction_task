@@ -1187,10 +1187,10 @@ const trialPhase = (function () {
         ? "rationale-row"
         : ""
       }">
-              <td>Age (Yrs) </td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.age ? fa.age + " yrs" : "N/A"
+              <td>Age (yrs) </td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.age ? fa.age  : "N/A"
       }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.age ? fb.age + " yrs" : "N/A"
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.age ? fb.age  : "N/A"
       }</td>
             </tr>
             <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 3
@@ -1283,7 +1283,7 @@ const trialPhase = (function () {
     try {
       const formatPercent = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? (num * 100).toFixed(0) + "%" : "N/A";
+        return !isNaN(num) ? (num * 100).toFixed(0)  : "N/A";
       };
       const formatAge = (value) => {
         const num = parseInt(value, 10);
@@ -1291,7 +1291,7 @@ const trialPhase = (function () {
       };
       const formatPerMin = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? num.toFixed(2) + "/min" : "N/A";
+        return !isNaN(num) ? num.toFixed(2)  : "N/A";
       };
 
       currentFightData = {
