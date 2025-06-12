@@ -76,7 +76,11 @@ const trialPhase = (function () {
           finalWager = 2;
         }
 
-        if (!isSolo && data.phase === "groupDelib" && data.subPhase === "wager") {
+        if (
+          !isSolo &&
+          data.phase === "groupDelib" &&
+          data.subPhase === "wager"
+        ) {
           expectedParticipants = 3;
           collectedWagers = {};
           collectedUserNames = {};
@@ -105,7 +109,9 @@ const trialPhase = (function () {
         }
 
         if (currentPhase === "result" && currentFightData) {
-          serverAiCorrect = currentFightData.winner == currentFightData.predicted_winner_numeric;
+          serverAiCorrect =
+            currentFightData.winner ==
+            currentFightData.predicted_winner_numeric;
         } else if (currentPhase === "result") {
           console.warn("Result phase started but currentFightData is missing.");
         }
@@ -113,7 +119,9 @@ const trialPhase = (function () {
         const forceShowScreen = () => {
           hideAllScreens();
 
-          console.log(`Showing screen for phase: ${currentPhase}, subPhase: ${currentSubPhase}`);
+          console.log(
+            `Showing screen for phase: ${currentPhase}, subPhase: ${currentSubPhase}`
+          );
 
           switch (currentPhase) {
             case "initial":
@@ -132,7 +140,9 @@ const trialPhase = (function () {
           setupDynamicCountdown();
 
           setTimeout(() => {
-            const visibleScreen = document.querySelector('.screen[style*="block"]');
+            const visibleScreen = document.querySelector(
+              '.screen[style*="block"]'
+            );
             if (!visibleScreen) {
               console.warn("No screen visible after transition, retrying...");
               forceShowScreen();
@@ -189,7 +199,9 @@ const trialPhase = (function () {
           collectedUserNames = { ...data.userNames };
         }
         displayAllConfirmedWagers(data.wagers);
-        const wagersDisplay = groupDelibScreen.querySelector("#confirmed-wagers-display");
+        const wagersDisplay = groupDelibScreen.querySelector(
+          "#confirmed-wagers-display"
+        );
         if (wagersDisplay) {
           wagersDisplay.style.display = "flex";
         }
@@ -220,7 +232,8 @@ const trialPhase = (function () {
   }
 
   function updateWaitingMessage(received, total) {
-    const wagersContainer = groupDelibScreen?.querySelector("#wagers-container");
+    const wagersContainer =
+      groupDelibScreen?.querySelector("#wagers-container");
     if (!wagersContainer) return;
 
     let waitingMsg = wagersContainer.querySelector(".waiting-message");
@@ -323,7 +336,8 @@ const trialPhase = (function () {
       if (currentSubPhase === "wager") {
         wagerSection.style.display = "block";
         chatSection.style.display = "none";
-        const hasContent = confirmedWagersDisplay.querySelector(".wager-column") ||
+        const hasContent =
+          confirmedWagersDisplay.querySelector(".wager-column") ||
           confirmedWagersDisplay.querySelector(".waiting-message");
         if (hasContent || isGroupWagerConfirmed) {
           confirmedWagersDisplay.style.display = "flex";
@@ -364,7 +378,8 @@ const trialPhase = (function () {
         if (currentSubPhase === "wager" && !isGroupWagerConfirmed) {
           const myClientID = sessionStorage.getItem("PROLIFIC_PID");
           const myUserName = sessionStorage.getItem("userName");
-          const wagerSlider = groupDelibScreen.querySelector("#group-wager-range");
+          const wagerSlider =
+            groupDelibScreen.querySelector("#group-wager-range");
           initialWager = parseInt(wagerSlider.value, 10);
 
           collectedWagers[myClientID] = initialWager;
@@ -395,15 +410,11 @@ const trialPhase = (function () {
     initialScreen.classList.add("screen");
     initialScreen.id = "initial-screen";
     initialScreen.innerHTML = `
-      <h2>Trial <span id="solo-trial-number">${currentTrial}</span> of ${totalTrials} - Initial Bet</h2>
-      <div id="initial-content"></div>
-      <button id="btn-confirm-initial">Confirm Initial Bet</button>
-      <div id="solo-initial-countdown"></div>
-    `;
+    <h2>Trial <span id="solo-trial-number">${currentTrial}</span> of ${totalTrials} - Initial Bet</h2>
+    <div id="initial-content"></div>
+    <div id="solo-initial-countdown"></div>
+  `;
     appContainer.appendChild(initialScreen);
-    initialScreen
-      .querySelector("#btn-confirm-initial")
-      .addEventListener("click", onConfirmInitial);
   }
 
   function onConfirmInitial() {
@@ -449,10 +460,13 @@ const trialPhase = (function () {
     groupDelibScreen.classList.add("screen");
     groupDelibScreen.id = "group-delib-screen";
     groupDelibScreen.innerHTML = `
-      <h2>Group Trial <span id="group-trial-number"></span> - <span id="group-phase-title">Bet Phase</span></h2>
-      <div id="group-content">
+    <h2>Group Trial <span id="group-trial-number"></span> - <span id="group-phase-title">Bet Phase</span></h2>
+    <div id="group-countdown"></div>
+    <div class="main-layout">
+      <div class="left-section">
         <div id="group-fight-info"></div>
-
+      </div>
+      <div class="right-section">
         <div id="wager-section" style="display: none;">
           <h3>Your Bet</h3>
           <div class="wager-slider-container">
@@ -464,24 +478,23 @@ const trialPhase = (function () {
           </div>
         </div>
 
-         <div id="confirmed-wagers-display" class="confirmed-wagers-display" style="display: none;">
-             <h3 class="wagers-title">Initial Bets</h3>
-             <div id="wagers-container" class="wagers-container">
-                <p style="color: #aaa; width: 100%; text-align: center;">Waiting for all bets...</p>
-             </div>
-         </div>
-
-        <div id="chat-section" style="display: none;">
-           <h3>Group Chat</h3>
-           <div class="chat-container" id="chat-messages"></div>
-           <div class="chat-input">
-             <input type="text" id="chat-input-text" placeholder="Type your opinion..." disabled />
-             <button id="chat-send-btn" disabled>Send</button>
-           </div>
+        <div id="confirmed-wagers-display" class="confirmed-wagers-display" style="display: none;">
+          <h3 class="wagers-title">Initial Bets</h3>
+          <div id="wagers-container" class="wagers-container">
+            <p style="color: #aaa; width: 100%; text-align: center;">Waiting for all bets...</p>
+          </div>
         </div>
 
-        <div id="group-countdown"></div>
-      </div>`;
+        <div id="chat-section" style="display: none;">
+          <h3>Group Chat</h3>
+          <div class="chat-container" id="chat-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="chat-input-text" placeholder="Type your opinion..." disabled />
+            <button id="chat-send-btn" disabled>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
     appContainer.appendChild(groupDelibScreen);
 
     groupDelibScreen
@@ -506,8 +519,11 @@ const trialPhase = (function () {
   }
 
   function displayAllConfirmedWagers(wagers) {
-    const displayContainer = groupDelibScreen.querySelector("#wagers-container");
-    const wagersDisplay = groupDelibScreen.querySelector("#confirmed-wagers-display");
+    const displayContainer =
+      groupDelibScreen.querySelector("#wagers-container");
+    const wagersDisplay = groupDelibScreen.querySelector(
+      "#confirmed-wagers-display"
+    );
 
     if (!displayContainer) return;
 
@@ -518,7 +534,8 @@ const trialPhase = (function () {
     const clientIDs = Object.keys(wagers).sort();
 
     if (clientIDs.length === 0) {
-      displayContainer.innerHTML = '<p style="color: #aaa; width: 100%; text-align: center;">Waiting for all bets...</p>';
+      displayContainer.innerHTML =
+        '<p style="color: #aaa; width: 100%; text-align: center;">Waiting for all bets...</p>';
       return;
     }
 
@@ -586,7 +603,9 @@ const trialPhase = (function () {
     isGroupWagerConfirmed = true;
 
     const wagerSlider = groupDelibScreen.querySelector("#group-wager-range");
-    const confirmButton = groupDelibScreen.querySelector("#btn-confirm-group-wager");
+    const confirmButton = groupDelibScreen.querySelector(
+      "#btn-confirm-group-wager"
+    );
 
     initialWager = parseInt(wagerSlider.value, 10);
 
@@ -630,7 +649,9 @@ const trialPhase = (function () {
     wagersContainer.innerHTML = "";
     wagersContainer.appendChild(confirmationMsg);
 
-    const wagersDisplay = groupDelibScreen.querySelector("#confirmed-wagers-display");
+    const wagersDisplay = groupDelibScreen.querySelector(
+      "#confirmed-wagers-display"
+    );
     wagersDisplay.style.display = "flex";
   }
 
@@ -639,15 +660,11 @@ const trialPhase = (function () {
     finalDecisionScreen.classList.add("screen");
     finalDecisionScreen.id = "final-decision-screen";
     finalDecisionScreen.innerHTML = `
-      <h2>Final Prediction & Bet Confirmation (Trial <span id="final-trial-number"></span> of ${totalTrials})</h2>
-      <div id="final-decision-content"></div>
-      <button id="btn-confirm-decision">Confirm Final Bet</button>
-      <div id="final-decision-countdown"></div>
-    `;
+    <h2>Final Prediction & Bet Confirmation (Trial <span id="final-trial-number"></span> of ${totalTrials})</h2>
+    <div id="final-decision-content"></div>
+    <div id="final-decision-countdown"></div>
+  `;
     appContainer.appendChild(finalDecisionScreen);
-    finalDecisionScreen
-      .querySelector("#btn-confirm-decision")
-      .addEventListener("click", onConfirmFinalDecision);
   }
 
   function onConfirmFinalDecision() {
@@ -664,9 +681,12 @@ const trialPhase = (function () {
     confirmButton.disabled = true;
     confirmButton.textContent = "Final Bet Confirmed";
 
-    const contentEl = finalDecisionScreen.querySelector("#final-decision-content");
+    const contentEl = finalDecisionScreen.querySelector(
+      "#final-decision-content"
+    );
     const movingMsgEl = document.createElement("p");
-    movingMsgEl.innerHTML = "<strong>Bet confirmed. Waiting for results...</strong>";
+    movingMsgEl.innerHTML =
+      "<strong>Bet confirmed. Waiting for results...</strong>";
     movingMsgEl.style.marginTop = "15px";
     movingMsgEl.style.color = "#00ff00";
     contentEl.appendChild(movingMsgEl);
@@ -695,24 +715,16 @@ const trialPhase = (function () {
     resultScreen.classList.add("screen");
     resultScreen.id = "result-screen";
     resultScreen.innerHTML = `
-      <h2>Trial <span id="result-trial-number"></span> Outcome</h2>
-      <div id="result-content"></div>
-      <button id="btn-next-trial">Next Trial</button>
-      <div id="result-countdown"></div>
-    `;
+    <h2>Trial <span id="result-trial-number"></span> Outcome</h2>
+    <div id="result-content"></div>
+    <div id="result-countdown"></div>
+  `;
     appContainer.appendChild(resultScreen);
-    resultScreen
-      .querySelector("#btn-next-trial")
-      .addEventListener("click", onNextTrial);
   }
 
   function onNextTrial() {
     if (resultConfirmed) return;
     resultConfirmed = true;
-
-    const nextButton = resultScreen.querySelector("#btn-next-trial");
-    nextButton.disabled = true;
-    nextButton.textContent = "Proceeding...";
 
     // Send confirmation to server
     ws.send(
@@ -734,31 +746,41 @@ const trialPhase = (function () {
 
     console.log("Showing solo trial screen for trial", currentTrial);
 
-    initialScreen.querySelector("#solo-trial-number").textContent = currentTrial;
-    const confirmButton = initialScreen.querySelector("#btn-confirm-initial");
-    confirmButton.disabled = false;
-    confirmButton.textContent = "Confirm Initial Bet";
+    initialScreen.querySelector("#solo-trial-number").textContent =
+      currentTrial;
 
     initialWager = 2;
 
     const contentEl = initialScreen.querySelector("#initial-content");
     const wallet = utilities.getWallet();
     contentEl.innerHTML = `
-    <p><strong>💰 Wallet:</strong> $${wallet}</p>
-    ${generateFighterTableHTML()}
-    <div class="ai-highlight">
-      <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-      ${window.aiMode !== "neutralAI"
+    <div class="main-layout">
+      <div class="left-section">
+        <p><strong>💰 Wallet:</strong> $${wallet}</p>
+        ${generateFighterTableHTML()}
+        <div class="ai-highlight">
+          <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction
+      }</p>
+          ${window.aiMode !== "neutralAI"
         ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
         }</p>`
         : ""
       }
-    </div>
-    <div class="wager-slider-container" style="margin-top: 20px;">
-      <label for="initial-wager-range">Initial Bet (0-4): <span id="initial-wager-value">${initialWager}</span></label>
-      <input type="range" min="0" max="4" step="1" value="${initialWager}" id="initial-wager-range" />
+        </div>
+      </div>
+      <div class="right-section initial-bet-position">
+        <div class="wager-slider-container">
+          <label for="initial-wager-range">Initial Bet (0-4): <span id="initial-wager-value">${initialWager}</span></label>
+          <input type="range" min="0" max="4" step="1" value="${initialWager}" id="initial-wager-range" />
+        </div>
+        <button id="btn-confirm-initial">Confirm Initial Bet</button>
+      </div>
     </div>
   `;
+
+    const confirmButton = contentEl.querySelector("#btn-confirm-initial");
+    confirmButton.disabled = false;
+    confirmButton.addEventListener("click", onConfirmInitial);
 
     const wagerSlider = contentEl.querySelector("#initial-wager-range");
     wagerSlider.disabled = false;
@@ -766,7 +788,8 @@ const trialPhase = (function () {
     wagerSlider.addEventListener("input", (e) => {
       if (!soloInitialConfirmed) {
         initialWager = parseInt(e.target.value, 10);
-        document.getElementById("initial-wager-value").textContent = initialWager;
+        document.getElementById("initial-wager-value").textContent =
+          initialWager;
       }
     });
 
@@ -789,15 +812,22 @@ const trialPhase = (function () {
       return;
     }
 
-    console.log(`Showing group delib screen for trial ${currentTrial}, phase: ${currentPhase}, subPhase: ${currentSubPhase}`);
+    console.log(
+      `Showing group delib screen for trial ${currentTrial}, phase: ${currentPhase}, subPhase: ${currentSubPhase}`
+    );
 
-    groupDelibScreen.querySelector("#group-trial-number").textContent = currentTrial;
+    groupDelibScreen.querySelector("#group-trial-number").textContent =
+      currentTrial;
     const phaseTitle = groupDelibScreen.querySelector("#group-phase-title");
     const wagerSection = groupDelibScreen.querySelector("#wager-section");
     const chatSection = groupDelibScreen.querySelector("#chat-section");
     const wagerSlider = groupDelibScreen.querySelector("#group-wager-range");
-    const confirmButton = groupDelibScreen.querySelector("#btn-confirm-group-wager");
-    const confirmedWagersDisplay = groupDelibScreen.querySelector("#confirmed-wagers-display");
+    const confirmButton = groupDelibScreen.querySelector(
+      "#btn-confirm-group-wager"
+    );
+    const confirmedWagersDisplay = groupDelibScreen.querySelector(
+      "#confirmed-wagers-display"
+    );
     const wagersContainer = groupDelibScreen.querySelector("#wagers-container");
 
     const fightInfoEl = groupDelibScreen.querySelector("#group-fight-info");
@@ -808,7 +838,8 @@ const trialPhase = (function () {
       <div class="ai-highlight">
         <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
         ${window.aiMode !== "neutralAI"
-        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"}</p>`
+        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
+        }</p>`
         : ""
       }
       </div>
@@ -824,7 +855,9 @@ const trialPhase = (function () {
       wagerSlider.value = initialWager;
       document.getElementById("group-wager-value").textContent = initialWager;
       confirmButton.disabled = isGroupWagerConfirmed;
-      confirmButton.textContent = isGroupWagerConfirmed ? "Bet Confirmed" : "Confirm Bet";
+      confirmButton.textContent = isGroupWagerConfirmed
+        ? "Bet Confirmed"
+        : "Confirm Bet";
       enableChatInputUI(false);
 
       if (isGroupWagerConfirmed) {
@@ -837,7 +870,8 @@ const trialPhase = (function () {
         wagersContainer.appendChild(confirmationMsg);
         confirmedWagersDisplay.style.display = "flex";
       } else {
-        wagersContainer.innerHTML = '<p style="color: #aaa; width: 100%; text-align: center;">Select your bet above.</p>';
+        wagersContainer.innerHTML =
+          '<p style="color: #aaa; width: 100%; text-align: center;">Select your bet above.</p>';
       }
 
       if (rejoinWagers && Object.keys(rejoinWagers).length > 0) {
@@ -846,7 +880,8 @@ const trialPhase = (function () {
           isGroupWagerConfirmed = true;
           initialWager = rejoinWagers[myClientID];
           wagerSlider.value = initialWager;
-          document.getElementById("group-wager-value").textContent = initialWager;
+          document.getElementById("group-wager-value").textContent =
+            initialWager;
           wagerSlider.disabled = true;
           confirmButton.disabled = true;
           confirmButton.textContent = "Bet Confirmed";
@@ -901,32 +936,44 @@ const trialPhase = (function () {
 
     console.log("Showing final decision screen for trial", currentTrial);
 
-    finalDecisionScreen.querySelector("#final-trial-number").textContent = currentTrial;
-    const confirmButton = finalDecisionScreen.querySelector("#btn-confirm-decision");
-    confirmButton.disabled = false;
-    confirmButton.textContent = "Confirm Final Bet";
+    finalDecisionScreen.querySelector("#final-trial-number").textContent =
+      currentTrial;
 
     finalWager = initialWager;
 
-    const contentEl = finalDecisionScreen.querySelector("#final-decision-content");
+    const contentEl = finalDecisionScreen.querySelector(
+      "#final-decision-content"
+    );
     const wallet = utilities.getWallet();
     contentEl.innerHTML = `
-      <p><strong>💰 Wallet:</strong> $${wallet}</p>
-      ${generateFighterTableHTML()}
-      <div class="ai-highlight">
-        <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-        ${window.aiMode !== "neutralAI"
+    <div class="main-layout">
+      <div class="left-section">
+        <p><strong>💰 Wallet:</strong> $${wallet}</p>
+        ${generateFighterTableHTML()}
+        <div class="ai-highlight">
+          <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction
+      }</p>
+          ${window.aiMode !== "neutralAI"
         ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
         }</p>`
         : ""
       }
+        </div>
       </div>
-      <div class="wager-slider-container" style="margin-top: 20px;">
-        <label for="final-wager-range">Final Bet (0-4): <span id="final-wager-value">${finalWager}</span></label>
-        <input type="range" min="0" max="4" step="1" value="${finalWager}" id="final-wager-range" />
+      <div class="right-section final-bet-position">
+        <div class="wager-slider-container">
+          <label for="final-wager-range">Final Bet (0-4): <span id="final-wager-value">${finalWager}</span></label>
+          <input type="range" min="0" max="4" step="1" value="${finalWager}" id="final-wager-range" />
+        </div>
+        <button id="btn-confirm-decision">Confirm Final Bet</button>
+        <p class="confirmation-message" style="margin-top: 15px; font-weight: bold; display: none;"></p>
       </div>
-      <p class="confirmation-message" style="margin-top: 15px; font-weight: bold; display: none;"></p>
-    `;
+    </div>
+  `;
+
+    const confirmButton = contentEl.querySelector("#btn-confirm-decision");
+    confirmButton.disabled = false;
+    confirmButton.addEventListener("click", onConfirmFinalDecision);
 
     const finalWagerSlider = contentEl.querySelector("#final-wager-range");
     finalWagerSlider.disabled = false;
@@ -968,10 +1015,8 @@ const trialPhase = (function () {
 
     console.log("Showing result screen for trial", currentTrial);
 
-    resultScreen.querySelector("#result-trial-number").textContent = currentTrial;
-    const nextButton = resultScreen.querySelector("#btn-next-trial");
-    nextButton.disabled = false;
-    nextButton.textContent = "Next Trial";
+    resultScreen.querySelector("#result-trial-number").textContent =
+      currentTrial;
 
     let walletBefore = utilities.getWallet();
     let outcomeText = "";
@@ -1091,16 +1136,16 @@ const trialPhase = (function () {
     const fighterBWins = currentFightData.predicted_winner_numeric === 0;
 
     const featureToRowMap = {
-      "Wins": 0,
-      "Losses": 1,
-      "Age": 2,
-      "Height": 3,
+      Wins: 0,
+      Losses: 1,
+      Age: 2,
+      Height: 3,
       "Strikes Landed per Minute": 4,
       "Significant Strikes Accuracy": 5,
       "Strike Defense": 6,
       "Takedown Accuracy": 7,
       "Takedown Defense": 8,
-      "Strikes Avoided per Minute": 9
+      "Strikes Avoided per Minute": 9,
     };
 
     const rationaleFeature = currentFightData.aiRationale || "";
@@ -1113,60 +1158,110 @@ const trialPhase = (function () {
           <thead>
             <tr>
               <th>Stat</th>
-              <th class="${fighterAWins ? 'winner-column' : ''}">Fighter A</th>
-              <th class="${fighterBWins ? 'winner-column' : ''}">Fighter B</th>
+              <th class="${fighterAWins ? "winner-column" : ""}">Fighter A</th>
+              <th class="${fighterBWins ? "winner-column" : ""}">Fighter B</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 0 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 0
+        ? "rationale-row"
+        : ""
+      }">
               <td>Wins</td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.wins ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.wins ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.wins ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.wins ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 1 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 1
+        ? "rationale-row"
+        : ""
+      }">
               <td>Losses</td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.losses ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.losses ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.losses ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.losses ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 2 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 2
+        ? "rationale-row"
+        : ""
+      }">
               <td>Age (Yrs) </td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.age ? fa.age + " yrs" : "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.age ? fb.age + " yrs" : "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.age ? fa.age + " yrs" : "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.age ? fb.age + " yrs" : "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 3 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 3
+        ? "rationale-row"
+        : ""
+      }">
               <td>Height</td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.height || "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.height || "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.height || "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.height || "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 4 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 4
+        ? "rationale-row"
+        : ""
+      }">
               <td>Strikes Landed/Min</td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.strikelaM ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.strikelaM ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.strikelaM ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.strikelaM ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 5 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 5
+        ? "rationale-row"
+        : ""
+      }">
               <td>Strike Accuracy (%) </td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.sigSacc ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.sigSacc ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.sigSacc ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.sigSacc ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 6 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 6
+        ? "rationale-row"
+        : ""
+      }">
               <td>Strike Defense (%) </td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.strDef ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.strDef ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.strDef ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.strDef ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 7 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 7
+        ? "rationale-row"
+        : ""
+      }">
               <td>Takedown Accuracy (%) </td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.tdAcc ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.tdAcc ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.tdAcc ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.tdAcc ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 8 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 8
+        ? "rationale-row"
+        : ""
+      }">
               <td>Takedown Defense (%) </td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.tdDef ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.tdDef ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.tdDef ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.tdDef ?? "N/A"
+      }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 9 ? 'rationale-row' : ''}">
+            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 9
+        ? "rationale-row"
+        : ""
+      }">
               <td>Strikes Avoided/Min</td>
-              <td class="${fighterAWins ? 'winner-column-cell' : ''}">${fa.SApM ?? "N/A"}</td>
-              <td class="${fighterBWins ? 'winner-column-cell' : ''}">${fb.SApM ?? "N/A"}</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.SApM ?? "N/A"
+      }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.SApM ?? "N/A"
+      }</td>
             </tr>
           </tbody>
         </table>
@@ -1188,7 +1283,7 @@ const trialPhase = (function () {
     try {
       const formatPercent = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? (num * 100).toFixed(0) : "N/A";
+        return !isNaN(num) ? (num * 100).toFixed(0) + "%" : "N/A";
       };
       const formatAge = (value) => {
         const num = parseInt(value, 10);
@@ -1196,7 +1291,7 @@ const trialPhase = (function () {
       };
       const formatPerMin = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? num.toFixed(2) : "N/A";
+        return !isNaN(num) ? num.toFixed(2) + "/min" : "N/A";
       };
 
       currentFightData = {
