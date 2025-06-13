@@ -276,8 +276,8 @@ const postTask = (function () {
     const thankYouDiv = document.getElementById("thank-you-message");
     thankYouDiv.style.display = "block";
     thankYouDiv.querySelector("#btn-home").addEventListener("click", () => {
-      window.location.reload();
-      //window.location.href = "https://app.prolific.com/submissions/complete?cc=C17HKXVH";
+      //window.location.reload();
+      window.location.href = "https://app.prolific.com/submissions/complete?cc=C17HKXVH";
     });
   }
 
