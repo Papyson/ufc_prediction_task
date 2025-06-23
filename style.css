@@ -1015,16 +1015,16 @@ button.validation-passed {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .questionnaire-divider {
     display: none;
   }
-  
+
   .question-group {
     margin-bottom: 10px;
     padding: 6px 8px;
   }
-  
+
   .question-group label {
     font-size: 12px;
   }
