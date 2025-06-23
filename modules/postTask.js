@@ -15,82 +15,91 @@ const postTask = (function () {
       <h2>Post-Task Survey</h2>
       <p>Thank you for participating in the UFC Prediction Experiment!</p><br/>
       <p id="final-wallet">Total Winnings: $0</p><br/>
-  
+
       <p>Now that you've completed the task, please rate how important you believe each of the following fighter stats actually is in predicting UFC fight outcomes.</p><br/>
       <p>Use the sliders to assign values between 1 (Not important at all) and 100 (Extremely important).</p><br/>
       <p>Base your ratings on what you've learned or noticed during the task.</p><br/>
-  
-      <div class="feature-sliders">
-        <div class="slider-group">
-          <label>Career Wins (Total number of fights the fighter has won)</label>
-          <input type="range" id="post-slider-wins" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
+
+      <div class="questionnaire-container">
+        <div class="questionnaire-column" data-column-label="Questions 1-5">
+          <div class="question-group">
+            <label>Career Wins (Total number of fights the fighter has won)</label>
+            <input type="range" id="post-slider-wins" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Career Losses (Total number of fights the fighter has lost)</label>
+            <input type="range" id="post-slider-losses" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Age (The fighter's current age in years)</label>
+            <input type="range" id="post-slider-age" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Height (The fighter's height, which can affect reach and leverage)</label>
+            <input type="range" id="post-slider-height" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Strikes Landed/Minute (Average number of strikes the fighter lands per minute)</label>
+            <input type="range" id="post-slider-slpm" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
         </div>
-  
-        <div class="slider-group">
-          <label>Career Losses (Total number of fights the fighter has lost)</label>
-          <input type="range" id="post-slider-losses" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Age (The fighter's current age in years)</label>
-          <input type="range" id="post-slider-age" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Height (The fighter's height, which can affect reach and leverage)</label>
-          <input type="range" id="post-slider-height" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Strikes Landed/Minute (Average number of strikes the fighter lands per minute)</label>
-          <input type="range" id="post-slider-slpm" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Strike Accuracy (Percentage of strikes that land successfully)</label>
-          <input type="range" id="post-slider-accuracy" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Strike Defense (Percentage of opponent strikes the fighter avoids)</label>
-          <input type="range" id="post-slider-defense" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Takedown Defense (Percentage of opponent takedown attempts successfully defended)</label>
-          <input type="range" id="post-slider-td-defense" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Strikes Avoided/Minute (Average number of strikes the fighter avoids per minute)</label>
-          <input type="range" id="post-slider-sapm" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
-        </div>
-  
-        <div class="slider-group">
-          <label>Takedown Accuracy (Percentage of takedown attempts that are successful)</label>
-          <input type="range" id="post-slider-td-accuracy" min="1" max="100" value="0" />
-          <span class="slider-value">0</span>
+        
+        <div class="questionnaire-divider"></div>
+        
+        <div class="questionnaire-column" data-column-label="Questions 6-10">
+          <div class="question-group">
+            <label>Strike Accuracy (Percentage of strikes that land successfully)</label>
+            <input type="range" id="post-slider-accuracy" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Strike Defense (Percentage of opponent strikes the fighter avoids)</label>
+            <input type="range" id="post-slider-defense" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Takedown Defense (Percentage of opponent takedown attempts successfully defended)</label>
+            <input type="range" id="post-slider-td-defense" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Strikes Avoided/Minute (Average number of strikes the fighter avoids per minute)</label>
+            <input type="range" id="post-slider-sapm" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
+
+          <div class="question-group">
+            <label>Takedown Accuracy (Percentage of takedown attempts that are successful)</label>
+            <input type="range" id="post-slider-td-accuracy" min="1" max="100" value="0" />
+            <span class="slider-value">0</span>
+          </div>
         </div>
       </div>
 
       <div id="posttask-validation-error" style="display: none; color: #ff4444; text-align: center; margin: 20px 0; font-weight: bold; animation: shake 0.5s ease-in-out infinite;">
         ⚠️ Please review and adjust all sliders above before completing!
       </div>
-  
-      <button id="btn-finish" disabled style="opacity: 0.5;">Finish</button>
-      <div id="posttask-countdown" style="margin-top: 10px;"></div>
+
+      <div class="questionnaire-actions">
+        <button id="btn-finish" disabled style="opacity: 0.5;">Finish</button>
+        <div id="posttask-countdown" style="margin-top: 10px;"></div>
+      </div>
+      
       <div id="thank-you-message" style="display: none; text-align: center; margin-top: 20px;">
         <h2>Thank you for your participation!</h2>
-        <button id="btn-home">Go to Prolific</button>
+        <button id="btn-home">Go to Home</button>
       </div>
     `;
 
