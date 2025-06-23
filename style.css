@@ -1029,3 +1029,239 @@ button.validation-passed {
     font-size: 12px;
   }
 }
+
+#practice-screen {
+  padding: 20px;
+}
+
+#practice-countdown-display {
+  position: absolute !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  padding: 12px 16px !important;
+  border-radius: 6px !important;
+  border: 2px solid #ffcc00 !important;
+  z-index: 9999 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+#practice-countdown-display div:first-child {
+  color: #ffcc00 !important;
+  font-weight: bold !important;
+  font-size: 0.9em !important;
+  margin-bottom: 4px !important;
+  text-align: center !important;
+}
+
+#practice-countdown-timer {
+  color: #fff !important;
+  font-size: 1.4em !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  font-family: "Courier New", monospace !important;
+}
+
+#practice-countdown {
+  margin-top: 20px;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 0;
+  color: #ffcc00;
+  font-size: 1.1em;
+}
+
+#practice-screen .main-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+#practice-screen .left-section {
+  flex: 2;
+  min-width: 0;
+}
+
+#practice-screen .right-section {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid #ffcc00;
+}
+
+#practice-screen .initial-bet-position {
+  margin-top: 35px;
+  align-self: flex-start;
+}
+
+#practice-screen .final-bet-position {
+  margin-top: 95px;
+  align-self: flex-start;
+}
+
+#practice-screen .right-section button {
+  width: 100%;
+  margin-top: 25px;
+}
+
+#practice-confirmed-wagers {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid #ffcc00;
+  border-radius: 5px;
+  min-height: 100px;
+}
+
+#practice-wagers-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  min-height: 60px;
+}
+
+#practice-chat-messages {
+  border: 2px solid #ffcc00;
+  border-radius: 4px;
+  height: 150px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+}
+
+#practice-chat-input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  background-color: #333;
+  color: #fff;
+}
+
+#practice-chat-send {
+  padding: 8px 12px;
+  margin-left: -1px;
+  border-radius: 0 4px 4px 0;
+  margin-top: 0;
+}
+
+#practice-screen .chat-message .user-name.my-message {
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+#practice-screen .transition-content {
+  text-align: center;
+  padding: 40px;
+}
+
+#practice-screen .transition-content h3 {
+  color: #00ff00;
+  margin-bottom: 20px;
+}
+
+#practice-screen .transition-content p {
+  font-size: 1.1em;
+  margin-bottom: 30px;
+}
+
+#practice-transition-countdown,
+#practice-countdown,
+#final-transition-countdown {
+  font-size: 1.3em;
+  color: #ffcc00;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+}
+
+#practice-countdown-timer,
+#final-countdown-timer {
+  font-family: "Courier New", monospace;
+  font-size: 1.2em;
+}
+
+@media (max-width: 768px) {
+  #practice-screen .main-layout {
+    flex-direction: column;
+  }
+
+  #practice-screen .right-section {
+    min-width: auto;
+    width: 100%;
+  }
+
+  #practice-wagers-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #practice-wagers-container .wager-column {
+    border-left: none;
+    border-bottom: 1px solid #555;
+    width: 80%;
+    margin-bottom: 5px;
+  }
+
+  #practice-wagers-container .wager-column:last-child {
+    border-bottom: none;
+  }
+}
+
+#practice-to-trials-countdown,
+#final-transition-countdown {
+  font-size: 1.3em;
+  color: #ffcc00;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+}
+
+#practice-to-trials-timer,
+#final-countdown-timer {
+  font-family: "Courier New", monospace;
+  font-size: 1.2em;
+}
+
+.transition-info-box {
+  background: rgba(255, 204, 0, 0.1);
+  border: 2px solid #ffcc00;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.transition-info-box h4 {
+  color: #ffcc00;
+  margin-bottom: 15px;
+}
+
+.transition-info-box ul {
+  color: #fff;
+  text-align: left;
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.experiment-ready-box {
+  background: rgba(0, 255, 0, 0.1);
+  border: 2px solid #00ff00;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.experiment-ready-box h4 {
+  color: #00ff00;
+  margin-bottom: 15px;
+}

@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       chat.init(ws);
       utilities.setWebSocket(ws);
       onboarding.init(ws);
+      practice.init(ws);
 
       preTask.showPreTaskScreen();
 

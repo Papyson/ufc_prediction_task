@@ -24,11 +24,11 @@ app.get("/downloads", (req, res) => {
 const server = http.createServer(app);
 
 // const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
-const wss = new WebSocket.Server({ 
+const wss = new WebSocket.Server({
   server,
   perMessageDeflate: false,
   clientTracking: true,
-  maxPayload: 1024 * 1024
+  maxPayload: 1024 * 1024,
 });
 
 let clients = new Map();
@@ -42,9 +42,13 @@ server.listen(PORT, () => {
   console.log(`Websocket server running on PORT wss ${PORT}`);
 });
 
+const PRACTICE_TRIALS = 10;
+const PRACTICE_TRIAL_DURATION_SOLO = 45000; // 45 seconds per solo practice trial
+const PRACTICE_TRIAL_DURATION_GROUP = 75000; // 75 seconds per group practice trial
+
 const ONBOARDING_DURATIONS = {
-  solo: 82000,    // 4 items * 20 seconds + 2 second buffer = 82 seconds
-  group: 122000    // 6 items * 20 seconds + 2 second buffer = 122 seconds
+  solo: 82000 + PRACTICE_TRIALS * PRACTICE_TRIAL_DURATION_SOLO, // 4 items * 20 seconds + 2 second buffer = 82 seconds + (10 practice trials * 45 seconds each)
+  group: 122000 + PRACTICE_TRIALS * PRACTICE_TRIAL_DURATION_GROUP, // 6 items * 20 seconds + 2 second buffer = 122 seconds + (10 practice trials * 75 seconds each)
 };
 
 // Trial phase constants
@@ -117,7 +121,7 @@ function initializeSessionState(sessionID, mode) {
   onboardingStates.set(sessionID, {
     readyParticipants: new Set(),
     startTime: null,
-    completed: false
+    completed: false,
   });
 
   // Get the session data to access AI mode
@@ -253,8 +257,10 @@ function startOnboardingPhase(sessionID) {
 
   const state = sessionStates.get(sessionID);
   const onboardingDuration = ONBOARDING_DURATIONS[state.mode];
-  
-  console.log(`Starting onboarding phase for session ${sessionID} (${state.mode} mode) - Duration: ${onboardingDuration}ms`);
+
+  console.log(
+    `Starting onboarding phase for session ${sessionID} (${state.mode} mode) - Duration: ${onboardingDuration}ms`
+  );
 
   broadcastToSession(sessionID, {
     type: "startOnboarding",
@@ -267,36 +273,36 @@ function startOnboardingPhase(sessionID) {
   const timeoutId = setTimeout(() => {
     completeOnboardingPhase(sessionID);
   }, onboardingDuration);
-  
+
   state.onboardingTimeoutId = timeoutId;
   sessionStates.set(sessionID, state);
 }
 
 function completeOnboardingPhase(sessionID) {
   if (!sessionStates.has(sessionID)) return;
-  
+
   const state = sessionStates.get(sessionID);
   console.log(`Completing onboarding phase for session ${sessionID}`);
-  
+
   if (state.onboardingTimeoutId) {
     clearTimeout(state.onboardingTimeoutId);
     state.onboardingTimeoutId = null;
   }
-  
+
   state.onboardingInProgress = false;
   state.currentPhase = state.mode === "group" ? "groupDelib" : "initial";
   state.currentSubPhase = state.mode === "group" ? "wager" : null;
-  
+
   sessionStates.set(sessionID, state);
-  
+
   onboardingStates.delete(sessionID);
-  
+
   broadcastToSession(sessionID, {
     type: "onboardingComplete",
     sessionID: sessionID,
-    mode: state.mode
+    mode: state.mode,
   });
-  
+
   setTimeout(() => {
     const currentState = sessionStates.get(sessionID);
     if (currentState) {
@@ -618,7 +624,7 @@ sessionManager.setUpdateCallback(broadcastSessionUpdate);
 
 wss.on("connection", (ws) => {
   ws.isAlive = true;
-  
+
   ws.on("pong", () => {
     ws.isAlive = true;
   });
@@ -638,10 +644,12 @@ wss.on("connection", (ws) => {
     const clientID = data.clientID;
 
     if (data.type === "ping" && clientID) {
-      ws.send(JSON.stringify({
-        type: "pong",
-        timestamp: Date.now()
-      }));
+      ws.send(
+        JSON.stringify({
+          type: "pong",
+          timestamp: Date.now(),
+        })
+      );
       console.log(`Received ping from ${clientID}, sent pong`);
       return;
     }
@@ -881,13 +889,19 @@ wss.on("connection", (ws) => {
         );
         return;
       }
-      updateParticipantData(sessionID, clientID, data.wagerType, wagerValue, data.username);
+      updateParticipantData(
+        sessionID,
+        clientID,
+        data.wagerType,
+        wagerValue,
+        data.username
+      );
       if (data.wagerType === "initialWager" && state.mode === "group") {
         broadcastToSession(sessionID, {
           type: "individualWager",
           clientID: clientID,
           userName: data.username,
-          wager: wagerValue
+          wager: wagerValue,
         });
       }
       ws.send(
@@ -1072,6 +1086,69 @@ wss.on("connection", (ws) => {
           })
         );
       }
+    } else if (data.type === "onboardingAndPracticeComplete" && clientID) {
+      console.log(
+        `Client ${clientID} has completed both onboarding and practice, ready for real trials`
+      );
+
+      const sessionID = getClientSession(clientID);
+      if (sessionID && sessionStates.has(sessionID)) {
+        const state = sessionStates.get(sessionID);
+
+        if (!state.participantData[clientID]) {
+          state.participantData[clientID] = {};
+        }
+        state.participantData[clientID].onboardingAndPracticeComplete = true;
+
+        const allReady = state.participants.every(
+          (pid) =>
+            state.participantData[pid] &&
+            state.participantData[pid].onboardingAndPracticeComplete
+        );
+
+        if (allReady) {
+          console.log(
+            `All participants in session ${sessionID} are ready, starting real trials`
+          );
+          state.currentTrial = 1;
+          state.currentPhase =
+            state.mode === "group" ? "groupDelib" : "initial";
+          state.currentSubPhase = state.mode === "group" ? "wager" : null;
+          state.phaseStartTime = Date.now();
+          state.onboardingInProgress = false;
+
+          state.participants.forEach((pid) => {
+            if (state.participantData[pid]) {
+              state.participantData[pid].onboardingComplete = false;
+              state.participantData[pid].wagerConfirmed = false;
+              state.participantData[pid].chatConfirmed = false;
+              state.participantData[pid].finalDecisionConfirmed = false;
+              state.participantData[pid].resultConfirmed = false;
+              state.participantData[pid].soloInitialConfirmed = false;
+            }
+          });
+
+          sessionStates.set(sessionID, state);
+
+          setTimeout(() => {
+            startTrialPhase(sessionID);
+          }, 1000);
+        } else {
+          console.log(
+            `Client ${clientID} ready, waiting for other participants in session ${sessionID}`
+          );
+          const clientWs = clients.get(clientID);
+          if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+            clientWs.send(
+              JSON.stringify({
+                type: "waitingForOthers",
+                message:
+                  "Waiting for other participants to complete practice...",
+              })
+            );
+          }
+        }
+      }
     } else {
       ws.send(
         JSON.stringify({
@@ -1090,7 +1167,7 @@ wss.on("connection", (ws) => {
       if (clientWs === ws) {
         disconnectedClientID = clientID;
         clients.delete(clientID);
-        clientUserNames.delete(clientID); 
+        clientUserNames.delete(clientID);
         console.log(`Client disconnected: ${clientID}`);
         break;
       }

@@ -800,50 +800,114 @@ const onboarding = (() => {
         clearInterval(onboardingCountdownInterval);
       }
       stopKeepAlive();
-      showTransitionScreen();
+      
+      startPracticeRound();
     }
-  
-    function showTransitionScreen() {
-      document.getElementById("onboarding-title").textContent =
-        "Onboarding Complete";
-      document.getElementById("onboarding-content").innerHTML = `
-      <div style="text-align: center; padding: 40px;">
-        <h3 style="color: #00ff00; margin-bottom: 20px;">✓ Onboarding Completed Successfully!</h3>
-        <p style="font-size: 1.1em; margin-bottom: 30px;">
-          Great! You're now ready to start the ${
-            currentMode === "solo" ? "Solo" : "Group"
-          } trials.
-        </p>
-        <div id="transition-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
-          Starting trials in <span id="countdown-timer">5</span> seconds...
-        </div>
-        <div style="margin-top: 20px; color: #aaa;">
-          <p>The first trial will begin automatically.</p>
-        </div>
+
+    function startPracticeRound() {
+  document.getElementById("onboarding-title").textContent = "Starting Practice Round";
+  document.getElementById("onboarding-content").innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <h3 style="color: #ffcc00; margin-bottom: 20px;">🎯 Time for Practice!</h3>
+      <p style="font-size: 1.1em; margin-bottom: 30px;">
+        Before the real experiment begins, you'll complete a practice session to familiarize yourself with the ${currentMode === "solo" ? "Solo" : "Group"} mode interface.
+      </p>
+      <div id="practice-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
+        Practice starting in <span id="practice-countdown-timer">3</span> seconds...
       </div>
-    `;
-  
-      document.getElementById("onboarding-countdown-display").style.display =
-        "none";
-  
-      let remaining = 5;
-      const countdownEl = document.getElementById("countdown-timer");
-  
-      const countdownInterval = setInterval(() => {
-        remaining--;
-        if (countdownEl) {
-          countdownEl.textContent = remaining;
-        }
-  
-        if (remaining <= 0) {
-          clearInterval(countdownInterval);
-          onboardingInProgress = false;
-          onboardingScreen.style.display = "none";
-        }
-      }, 1000);
-  
-      document.getElementById("onboarding-sync-status").style.display = "none";
+      <div style="margin-top: 20px; color: #aaa;">
+        <p>Practice data will not be saved - this is just for learning!</p>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("onboarding-countdown-display").style.display = "none";
+
+  let remaining = 3;
+  const countdownEl = document.getElementById("practice-countdown-timer");
+
+  const countdownInterval = setInterval(() => {
+    remaining--;
+    if (countdownEl) {
+      countdownEl.textContent = remaining;
     }
+
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      hideAllScreens();
+      // Start the practice round
+      practice.startPractice(currentMode);
+    }
+  }, 1000);
+}
+
+// Add new function to handle practice completion:
+function completePractice() {
+  // This will be called by practice module when practice is done
+  showFinalTransitionScreen();
+}
+  
+function showFinalTransitionScreen() {
+  hideAllScreens();
+  onboardingScreen.style.display = "block";
+  
+  document.getElementById("onboarding-title").textContent = "Ready to Begin Experiment";
+  document.getElementById("onboarding-content").innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <h3 style="color: #00ff00; margin-bottom: 20px;">✓ All Training Completed!</h3>
+      <p style="font-size: 1.1em; margin-bottom: 20px;">
+        Excellent! You've completed both the tutorial and practice session for ${currentMode === "solo" ? "Solo" : "Group"} mode.
+      </p>
+      <div style="background: rgba(0, 255, 0, 0.1); border: 2px solid #00ff00; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h4 style="color: #00ff00; margin-bottom: 15px;">🎯 Real Experiment Starting</h4>
+        <p style="color: #fff; margin-bottom: 10px;">
+          You are now entering the actual experiment phase:
+        </p>
+        <ul style="color: #fff; text-align: left; margin: 15px 0; padding-left: 20px;">
+          <li>Fresh $100 starting wallet</li>
+          <li>Real UFC fight data and outcomes</li>
+          <li>Your performance affects your bonus payment</li>
+          <li>All decisions will be recorded for research</li>
+        </ul>
+      </div>
+      <div id="final-transition-countdown" style="font-size: 1.3em; color: #ffcc00; font-weight: bold;">
+        Synchronizing with server... <span id="final-countdown-timer">5</span> seconds
+      </div>
+      <div style="margin-top: 20px; color: #aaa;">
+        <p>The experiment will begin automatically when server is ready!</p>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("onboarding-countdown-display").style.display = "none";
+
+  let remaining = 5;
+  const countdownEl = document.getElementById("final-countdown-timer");
+
+  const countdownInterval = setInterval(() => {
+    remaining--;
+    if (countdownEl) {
+      countdownEl.textContent = remaining;
+    }
+
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      onboardingInProgress = false;
+      onboardingScreen.style.display = "none";
+      
+      // NOW notify the server that onboarding is truly complete
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "onboardingAndPracticeComplete",
+          clientID: sessionStorage.getItem("PROLIFIC_PID"),
+          timestamp: Date.now()
+        }));
+      }
+    }
+  }, 1000);
+
+  document.getElementById("onboarding-sync-status").style.display = "none";
+}
   
     function hideAllScreens() {
       document.querySelectorAll(".screen").forEach((screen) => {
@@ -863,6 +927,7 @@ const onboarding = (() => {
       showOnboardingFlow,
       handleOnboardingMessage,
       completeOnboarding,
+      completePractice,
       isOnboardingInProgress: () => onboardingInProgress,
       ONBOARDING_CONFIG,
     };

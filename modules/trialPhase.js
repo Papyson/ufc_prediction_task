@@ -65,7 +65,8 @@ const trialPhase = (function () {
         if (data.sessionID) sessionID = data.sessionID;
         if (data.mode) isSolo = data.mode === "solo";
         console.log(
-          `Session update: ID=${sessionID}, Mode=${isSolo ? "Solo" : "Group"
+          `Session update: ID=${sessionID}, Mode=${
+            isSolo ? "Solo" : "Group"
           }, Status=${data.status}`
         );
       } else if (data.type === "phaseChange") {
@@ -220,6 +221,10 @@ const trialPhase = (function () {
         if (data.event === "trialData") {
           trialDataSaved = true;
         }
+      } else if (data.type === "waitingForOthers") {
+        console.log("Waiting for other participants:", data.message);
+      } else if (data.type === "onboardingAndPracticeComplete") {
+        console.log("All participants ready, trials will begin shortly");
       }
     } catch (error) {
       console.error(
@@ -759,13 +764,16 @@ const trialPhase = (function () {
         <p><strong>💰 Wallet:</strong> $${wallet}</p>
         ${generateFighterTableHTML()}
         <div class="ai-highlight">
-          <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction
-      }</p>
-          ${window.aiMode !== "neutralAI"
-        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
-        }</p>`
-        : ""
-      }
+          <p><strong>AI Prediction:</strong> ${
+            currentFightData.aiPrediction
+          }</p>
+          ${
+            window.aiMode !== "neutralAI"
+              ? `<p><strong>Explanation:</strong> ${
+                  currentFightData.justification || "N/A"
+                }</p>`
+              : ""
+          }
         </div>
       </div>
       <div class="right-section initial-bet-position">
@@ -837,11 +845,13 @@ const trialPhase = (function () {
       ${generateFighterTableHTML()}
       <div class="ai-highlight">
         <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction}</p>
-        ${window.aiMode !== "neutralAI"
-        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
-        }</p>`
-        : ""
-      }
+        ${
+          window.aiMode !== "neutralAI"
+            ? `<p><strong>Explanation:</strong> ${
+                currentFightData.justification || "N/A"
+              }</p>`
+            : ""
+        }
       </div>
     `;
 
@@ -951,13 +961,16 @@ const trialPhase = (function () {
         <p><strong>💰 Wallet:</strong> $${wallet}</p>
         ${generateFighterTableHTML()}
         <div class="ai-highlight">
-          <p><strong>AI Prediction:</strong> ${currentFightData.aiPrediction
-      }</p>
-          ${window.aiMode !== "neutralAI"
-        ? `<p><strong>Explanation:</strong> ${currentFightData.justification || "N/A"
-        }</p>`
-        : ""
-      }
+          <p><strong>AI Prediction:</strong> ${
+            currentFightData.aiPrediction
+          }</p>
+          ${
+            window.aiMode !== "neutralAI"
+              ? `<p><strong>Explanation:</strong> ${
+                  currentFightData.justification || "N/A"
+                }</p>`
+              : ""
+          }
         </div>
       </div>
       <div class="right-section final-bet-position">
@@ -1044,9 +1057,10 @@ const trialPhase = (function () {
 
     resultContent.innerHTML = `
       <p><strong>Fight Outcome:</strong> ${winnerText}</p>
-      <p><strong>AI Prediction was:</strong> ${serverAiCorrect
-        ? '<span style="color: lightgreen;">Correct</span>'
-        : '<span style="color: salmon;">Incorrect</span>'
+      <p><strong>AI Prediction was:</strong> ${
+        serverAiCorrect
+          ? '<span style="color: lightgreen;">Correct</span>'
+          : '<span style="color: salmon;">Incorrect</span>'
       }</p>
       <p>${outcomeText}</p>
       <hr style="margin: 10px 0; border-color: #555;">
@@ -1163,105 +1177,135 @@ const trialPhase = (function () {
             </tr>
           </thead>
           <tbody>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 0
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 0
+                ? "rationale-row"
+                : ""
+            }">
               <td>Wins</td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.wins ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.wins ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.wins ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.wins ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 1
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 1
+                ? "rationale-row"
+                : ""
+            }">
               <td>Losses</td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.losses ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.losses ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.losses ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.losses ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 2
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 2
+                ? "rationale-row"
+                : ""
+            }">
               <td>Age (yrs) </td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.age ? fa.age  : "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.age ? fb.age  : "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.age ? fa.age : "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.age ? fb.age : "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 3
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 3
+                ? "rationale-row"
+                : ""
+            }">
               <td>Height</td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.height || "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.height || "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.height || "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.height || "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 4
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 4
+                ? "rationale-row"
+                : ""
+            }">
               <td>Strikes Landed/Min</td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.strikelaM ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.strikelaM ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.strikelaM ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.strikelaM ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 5
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 5
+                ? "rationale-row"
+                : ""
+            }">
               <td>Strike Accuracy (%) </td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.sigSacc ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.sigSacc ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.sigSacc ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.sigSacc ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 6
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 6
+                ? "rationale-row"
+                : ""
+            }">
               <td>Strike Defense (%) </td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.strDef ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.strDef ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.strDef ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.strDef ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 7
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 7
+                ? "rationale-row"
+                : ""
+            }">
               <td>Takedown Accuracy (%) </td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.tdAcc ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.tdAcc ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.tdAcc ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.tdAcc ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 8
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 8
+                ? "rationale-row"
+                : ""
+            }">
               <td>Takedown Defense (%) </td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.tdDef ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.tdDef ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.tdDef ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.tdDef ?? "N/A"
+    }</td>
             </tr>
-            <tr class="${window.aiMode !== "neutralAI" && rowToHighlight === 9
-        ? "rationale-row"
-        : ""
-      }">
+            <tr class="${
+              window.aiMode !== "neutralAI" && rowToHighlight === 9
+                ? "rationale-row"
+                : ""
+            }">
               <td>Strikes Avoided/Min</td>
-              <td class="${fighterAWins ? "winner-column-cell" : ""}">${fa.SApM ?? "N/A"
-      }</td>
-              <td class="${fighterBWins ? "winner-column-cell" : ""}">${fb.SApM ?? "N/A"
-      }</td>
+              <td class="${fighterAWins ? "winner-column-cell" : ""}">${
+      fa.SApM ?? "N/A"
+    }</td>
+              <td class="${fighterBWins ? "winner-column-cell" : ""}">${
+      fb.SApM ?? "N/A"
+    }</td>
             </tr>
           </tbody>
         </table>
@@ -1283,7 +1327,7 @@ const trialPhase = (function () {
     try {
       const formatPercent = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? (num * 100).toFixed(0)  : "N/A";
+        return !isNaN(num) ? (num * 100).toFixed(0) : "N/A";
       };
       const formatAge = (value) => {
         const num = parseInt(value, 10);
@@ -1291,7 +1335,7 @@ const trialPhase = (function () {
       };
       const formatPerMin = (value) => {
         const num = parseFloat(value);
-        return !isNaN(num) ? num.toFixed(2)  : "N/A";
+        return !isNaN(num) ? num.toFixed(2) : "N/A";
       };
 
       currentFightData = {
@@ -1321,14 +1365,15 @@ const trialPhase = (function () {
         },
         predicted_winner_numeric:
           trialDataRow.predicted_winner === "0" ||
-            trialDataRow.predicted_winner === 0
+          trialDataRow.predicted_winner === 0
             ? 0
             : 1,
-        aiPrediction: `Fighter ${trialDataRow.predicted_winner === "0" ||
-            trialDataRow.predicted_winner === 0
+        aiPrediction: `Fighter ${
+          trialDataRow.predicted_winner === "0" ||
+          trialDataRow.predicted_winner === 0
             ? "B"
             : "A"
-          } to win`,
+        } to win`,
         aiRationale: trialDataRow.rationale_feature || "N/A",
         winner:
           trialDataRow.winner !== undefined
