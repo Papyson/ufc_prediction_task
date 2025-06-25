@@ -2,7 +2,7 @@ r_wins_total,r_losses_total,r_age,r_height,r_SLpM_total,r_SApM_total,r_sig_str_a
 14,5,31.0,182.88,5.6,3.35,0.56,0.53,0.55,0.56,11,1,26.0,170.18,3.45,2.28,0.48,0.54,0.57,0.66,1,0,Losses,A lower Losses gives Blue Fighter a competitive edge in the fight.
 35,11,44.0,167.64,2.65,2.59,0.4,0.3,0.64,0.58,35,10,43.0,175.26,2.72,2.79,0.45,0.62,0.49,0.6,1,1,Strike Defense,Red Fighter is more likely to win thanks to its higher Strike Defense compared to its opponent.
 38,21,42.0,170.18,2.64,3.01,0.33,0.36,0.61,0.67,15,7,42.0,177.8,1.25,1.88,0.39,0.27,0.58,0.5,1,1,Strikes Avoided per Minute,A higher Strikes Avoided per Minute gives Red Fighter a competitive advantage in the fight.
-20,16,39.0,172.72,3.68,4.09,0.4,0.35,0.62,0.75,24,11,38.0,180.34,4.18,4.34,0.45,0.5,0.57,0.75,0,0,Takedown Accuracy,A higher Takedown Accuracy gives Blue Fighter a competitive advantage in the fight.
+20,16,39.0,172.72,3.68,4.09,0.4,0.35,0.62,0.75,24,11,38.0,180.34,4.18,4.34,0.45,0.5,0.57,0.75,0,0,Takedown Accuracy,A high Takedown Accuracy gives Blue Fighter a competitive advantage in the fight.
 17,4,33.0,175.26,2.69,2.76,0.42,0.66,0.57,0.52,9,5,39.0,170.18,2.57,3.06,0.39,1.0,0.51,0.37,1,1,Significant Strikes Accuracy,"Red Fighter is favored because it has a higher Significant Strikes Accuracy, indicating superior performance."
 14,7,31.0,175.26,4.63,4.9,0.41,0.31,0.56,0.6,27,13,35.0,172.72,4.34,4.23,0.4,0.18,0.51,0.56,0,0,Wins,A higher Wins gives Blue Fighter a competitive advantage in the fight.
 24,7,40.0,175.26,2.93,1.79,0.45,0.45,0.63,0.63,35,17,39.0,180.34,4.05,3.05,0.47,0.59,0.64,0.72,1,1,Losses,Red Fighter is favored because it has a lower Losses compared to its opponent.

@@ -318,7 +318,7 @@ router.get('/', async (req, res) => {
 
   // 3) Build headers
   const trialCount = sessions[0].data.trialCount || 50;
-  const headers = ['sessionID','clientID','aiMode', ...preFields];
+  const headers = ['sessionID','clientID','aiMode', 'endedAt', ...preFields];
 
   for (let i = 1; i <= trialCount; i++) {
     // always export in presentation order
@@ -374,7 +374,14 @@ router.get('/', async (req, res) => {
       : Array.from({ length: trialCount }, (_, i) => i);
 
     for (const pid of participants) {
-      const row = { sessionID: sid, clientID: pid, aiMode: sData.aiMode || '' };
+      const row = {
+        sessionID: sid,
+        clientID: pid,
+        aiMode:   sData.aiMode || '',
+        endedAt:  sData.endedAt
+                    ? sData.endedAt.toDate().toISOString()
+                    : ''       // accommodate null
+     };
 
       // -- Pre‑task survey --
       const preSnap = await firestore
