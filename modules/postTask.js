@@ -99,7 +99,7 @@ const postTask = (function () {
       
       <div id="thank-you-message" style="display: none; text-align: center; margin-top: 20px;">
         <h2>Thank you for your participation!</h2>
-        <button id="btn-home">Go to Home</button>
+        <button id="btn-home">Go to Prolific</button>
       </div>
     `;
 
